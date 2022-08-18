@@ -202,6 +202,7 @@ begin
     -- Main SoC
     soc0: entity work.soc
         generic map(
+            ICACHE_NUM_WAYS    => 8, -- increase from default 2
             MEMORY_SIZE        => BRAM_SIZE,
             RAM_INIT_FILE      => RAM_INIT_FILE,
             SIM                => false,
