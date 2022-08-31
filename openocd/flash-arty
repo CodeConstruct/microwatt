@@ -19,6 +19,26 @@ def flash(cable, config, flash_proxy, address, data, filetype="", set_qe=False):
     print(script)
     subprocess.call(["openocd", "-f", cable, "-f", config, "-c", script])
 
+# Loads a bitstream directly to fpga, not flash
+def load(cable, config, flash_proxy, data, set_qe=False):
+    script = "; ".join([
+        "init",
+        f"pld load 0 {data}",
+        "exit"
+    ])
+    print(script)
+    subprocess.call(["openocd", "-f", cable, "-f", config, "-c", script])
+
+def read(cable, config, flash_proxy, data, set_qe=False):
+    script = "; ".join([
+        "init",
+        "jtagspi_init 0 {{{}}}".format(flash_proxy),
+        f"flash read_bank 0 {data}",
+        "exit"
+    ])
+    print(script)
+    subprocess.call(["openocd", "-f", cable, "-f", config, "-c", script])
+
 def get_version():
     a = subprocess.run(["openocd", "-v"], capture_output=True)
     if a.returncode != 0:
@@ -36,6 +56,8 @@ parser.add_argument("-a", "--address", help="offset in flash", type=lambda x: in
 parser.add_argument("-f", "--fpga", help="a35, a100 or a200", default="a35")
 parser.add_argument("-t", "--filetype", help="file type such as 'bin'", default="")
 parser.add_argument("-c", "--cable", help="cable type such as 'arty'", default="arty")
+parser.add_argument("-r", "--read", help="read flash", action="store_true")
+parser.add_argument("-l", "--load", help="load bitstream to jpga (not flash)", action="store_true")
 args = parser.parse_args()
 
 version = get_version()
@@ -56,4 +78,9 @@ proxy = os.path.join(BASE, proxy)
 config = os.path.join(BASE, "xilinx-xc7{}.cfg".format(version))
 cable = os.path.join(BASE, "{}.cfg".format(args.cable))
 
-flash(cable, config, proxy, args.address, args.file, args.filetype.lower())
+if args.read:
+    read(cable, config, proxy, args.address, args.file)
+elif args.load:
+    load(cable, config, proxy, args.file)
+else:
+    flash(cable, config, proxy, args.address, args.file, args.filetype.lower())
