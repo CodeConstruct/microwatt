@@ -234,14 +234,24 @@ static void boot_sdram(void)
 	flush_cpu_icache();
 }
 
+static void git_version(uint64_t *rev, bool *dirty) {
+	uint64_t gitinfo;
+	gitinfo = readq(SYSCON_BASE + SYS_REG_GIT_INFO);
+        *dirty = gitinfo >> 63;
+        *rev = gitinfo << 8 >> 8;
+}
+
 uint64_t main(void)
 {
 	unsigned long ftr, val;
 	unsigned int fl_off = 0;
 	bool try_flash = false;
+	uint64_t rev;
+	bool dirty;
 
 	/* Init the UART */
 	console_init();
+	git_version(&rev, &dirty);
 
 	printf("\n\nWelcome to Microwatt !\n\n");
 
@@ -250,6 +260,9 @@ uint64_t main(void)
 	 */
 	printf(" Soc signature: %016llx\n",
 	       (unsigned long long)readq(SYSCON_BASE + SYS_REG_SIGNATURE));
+
+	printf(" HDL Git SHA1: %014llx%s\n", rev, dirty ? "-dirty" : "");
+
 	printf("  Soc features: ");
 	ftr = readq(SYSCON_BASE + SYS_REG_INFO);
 	if (ftr & SYS_REG_INFO_HAS_UART)
