@@ -26,5 +26,6 @@ do
     liteeth_gen --output-dir=$TARGET_BUILD_PATH $MY_PATH/$i.yml
 
     cp $TARGET_BUILD_PATH/gateware/liteeth_core.v $TARGET_GEN_PATH/
+    cp $TARGET_BUILD_PATH/csr.csv $TARGET_GEN_PATH/
 done
 	 
