@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TARGETS="arty nexys-video wukong-v2"
+TARGETS="arty nexys-video wukong-v2 antmicro-artix-dc-scm"
 
 ME=$(realpath $0)
 echo ME=$ME

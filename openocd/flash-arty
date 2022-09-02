@@ -57,7 +57,7 @@ parser.add_argument("-f", "--fpga", help="a35, a100 or a200", default="a35")
 parser.add_argument("-t", "--filetype", help="file type such as 'bin'", default="")
 parser.add_argument("-c", "--cable", help="cable type such as 'arty'", default="arty")
 parser.add_argument("-r", "--read", help="read flash", action="store_true")
-parser.add_argument("-l", "--load", help="load bitstream to jpga (not flash)", action="store_true")
+parser.add_argument("-l", "--load", help="load bitstream to fpga (not flash)", action="store_true")
 args = parser.parse_args()
 
 version = get_version()

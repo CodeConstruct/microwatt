@@ -371,7 +371,7 @@ targets:
       - has_uart1
       - has_fpu
       - has_btc
-    generate: [litedram_nexys_video, liteeth_nexys_video, git_hash]
+    generate: [litedram_nexys_video, liteeth_antmicro_artix_dc_scm, git_hash]
     tools:
       vivado: {part : xc7a100tfgg484-1}
     toplevel : toplevel
@@ -475,6 +475,10 @@ generate:
   liteeth_nexys_video:
     generator: liteeth_gen
     parameters: {board : nexys-video}
+
+  liteeth_antmicro_artix_dc_scm:
+    generator: liteeth_gen
+    parameters: {board : antmicro-artix-dc-scm}
 
   litedram_acorn_cle_215:
     generator: litedram_gen
