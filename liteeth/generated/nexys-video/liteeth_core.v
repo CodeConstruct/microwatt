@@ -9,7 +9,7 @@
 // Filename   : liteeth_core.v
 // Device     : 
 // LiteX sha1 : --------
-// Date       : 2022-09-02 15:55:19
+// Date       : 2022-09-06 11:07:46
 //------------------------------------------------------------------------------
 
 
@@ -72,16 +72,20 @@ wire main_maccore_ethphy_eth_rx_clk_ibuf;
 (* dont_touch = "true" *) wire eth_tx_clk;
 wire eth_tx_rst;
 wire eth_tx_delayed_clk;
-reg  main_maccore_ethphy_reset0 = 1'd0;
-reg  main_maccore_ethphy_power_down = 1'd0;
-wire main_maccore_ethphy_locked;
+reg  main_maccore_ethphy_pll_reset = 1'd0;
+reg  main_maccore_ethphy_pll_power_down = 1'd0;
+wire main_maccore_ethphy_pll_locked;
 wire main_maccore_ethphy_clkin;
 wire main_maccore_ethphy_clkout0;
 wire main_maccore_ethphy_clkout_buf0;
 wire main_maccore_ethphy_clkout1;
 wire main_maccore_ethphy_clkout_buf1;
 wire main_maccore_ethphy_eth_tx_clk_obuf;
-wire main_maccore_ethphy_reset1;
+wire main_maccore_ethphy_reset;
+wire main_maccore_ethphy_hw_reset_reset;
+reg  [8:0] main_maccore_ethphy_hw_reset_counter = 9'd0;
+wire main_maccore_ethphy_hw_reset_counter_done;
+wire main_maccore_ethphy_hw_reset_counter_ce;
 wire main_maccore_ethphy_sink_valid;
 wire main_maccore_ethphy_sink_ready;
 wire main_maccore_ethphy_sink_first;
@@ -1151,11 +1155,14 @@ assign main_maccore_maccore_bus_errors_status = main_maccore_maccore_bus_errors;
 assign sys_clk = sys_clock;
 assign por_clk = sys_clock;
 assign sys_rst = main_maccore_int_rst;
-assign main_maccore_ethphy_reset1 = main_maccore_ethphy_reset_storage;
-assign rgmii_eth_rst_n = (~main_maccore_ethphy_reset1);
+assign main_maccore_ethphy_reset = (main_maccore_ethphy_reset_storage | main_maccore_ethphy_hw_reset_reset);
+assign rgmii_eth_rst_n = (~main_maccore_ethphy_reset);
 assign main_maccore_ethphy_clkin = eth_rx_clk;
 assign eth_tx_clk = main_maccore_ethphy_clkout_buf0;
 assign eth_tx_delayed_clk = main_maccore_ethphy_clkout_buf1;
+assign main_maccore_ethphy_hw_reset_counter_done = (main_maccore_ethphy_hw_reset_counter == 9'd256);
+assign main_maccore_ethphy_hw_reset_counter_ce = (~main_maccore_ethphy_hw_reset_counter_done);
+assign main_maccore_ethphy_hw_reset_reset = (~main_maccore_ethphy_hw_reset_counter_done);
 assign main_maccore_ethphy_sink_ready = 1'd1;
 assign main_maccore_ethphy_liteethphyrgmiirx_last = ((~main_maccore_ethphy_liteethphyrgmiirx_rx_ctl) & main_maccore_ethphy_liteethphyrgmiirx_rx_ctl_d);
 assign main_maccore_ethphy_liteethphyrgmiirx_source_last = main_maccore_ethphy_liteethphyrgmiirx_last;
@@ -1287,14 +1294,14 @@ always @(*) begin
 end
 assign main_tx_converter_converter_source_payload_valid_token_count = main_tx_converter_converter_last;
 always @(*) begin
-	main_tx_last_be_source_valid <= 1'd0;
-	main_tx_last_be_source_first <= 1'd0;
-	main_tx_last_be_source_last <= 1'd0;
-	builder_maccore_txdatapath_liteethmactxlastbe_next_state <= 1'd0;
 	main_tx_last_be_source_payload_data <= 8'd0;
 	main_tx_last_be_source_payload_last_be <= 1'd0;
 	main_tx_last_be_source_payload_error <= 1'd0;
 	main_tx_last_be_sink_ready <= 1'd0;
+	main_tx_last_be_source_valid <= 1'd0;
+	main_tx_last_be_source_first <= 1'd0;
+	main_tx_last_be_source_last <= 1'd0;
+	builder_maccore_txdatapath_liteethmactxlastbe_next_state <= 1'd0;
 	builder_maccore_txdatapath_liteethmactxlastbe_next_state <= builder_maccore_txdatapath_liteethmactxlastbe_state;
 	case (builder_maccore_txdatapath_liteethmactxlastbe_state)
 		1'd1: begin
@@ -1322,16 +1329,16 @@ always @(*) begin
 end
 assign main_tx_padding_counter_done = (main_tx_padding_counter >= 6'd59);
 always @(*) begin
+	main_tx_padding_source_last <= 1'd0;
+	main_tx_padding_source_payload_data <= 8'd0;
+	main_tx_padding_source_payload_last_be <= 1'd0;
+	main_tx_padding_source_payload_error <= 1'd0;
 	main_tx_padding_sink_ready <= 1'd0;
 	builder_maccore_txdatapath_liteethmacpaddinginserter_next_state <= 1'd0;
 	main_tx_padding_counter_clockdomainsrenamer0_next_value <= 16'd0;
 	main_tx_padding_counter_clockdomainsrenamer0_next_value_ce <= 1'd0;
 	main_tx_padding_source_valid <= 1'd0;
 	main_tx_padding_source_first <= 1'd0;
-	main_tx_padding_source_last <= 1'd0;
-	main_tx_padding_source_payload_data <= 8'd0;
-	main_tx_padding_source_payload_last_be <= 1'd0;
-	main_tx_padding_source_payload_error <= 1'd0;
 	builder_maccore_txdatapath_liteethmacpaddinginserter_next_state <= builder_maccore_txdatapath_liteethmacpaddinginserter_state;
 	case (builder_maccore_txdatapath_liteethmacpaddinginserter_state)
 		1'd1: begin
@@ -1442,6 +1449,10 @@ always @(*) begin
 	main_liteethmaccrc32inserter_next[31] <= ((main_liteethmaccrc32inserter_last[23] ^ main_liteethmaccrc32inserter_last[29]) ^ main_liteethmaccrc32inserter_data1[2]);
 end
 always @(*) begin
+	main_liteethmaccrc32inserter_sink_ready <= 1'd0;
+	main_liteethmaccrc32inserter_is_ongoing0 <= 1'd0;
+	main_liteethmaccrc32inserter_is_ongoing1 <= 1'd0;
+	builder_maccore_txdatapath_bufferizeendpoints_next_state <= 2'd0;
 	main_liteethmaccrc32inserter_source_valid <= 1'd0;
 	main_liteethmaccrc32inserter_ce <= 1'd0;
 	main_liteethmaccrc32inserter_reset <= 1'd0;
@@ -1456,10 +1467,6 @@ always @(*) begin
 	main_liteethmaccrc32inserter_last_be0 <= 1'd0;
 	main_liteethmaccrc32inserter_last_be2_clockdomainsrenamer1_next_value1 <= 1'd0;
 	main_liteethmaccrc32inserter_last_be2_clockdomainsrenamer1_next_value_ce1 <= 1'd0;
-	main_liteethmaccrc32inserter_sink_ready <= 1'd0;
-	main_liteethmaccrc32inserter_is_ongoing0 <= 1'd0;
-	main_liteethmaccrc32inserter_is_ongoing1 <= 1'd0;
-	builder_maccore_txdatapath_bufferizeendpoints_next_state <= 2'd0;
 	builder_maccore_txdatapath_bufferizeendpoints_next_state <= builder_maccore_txdatapath_bufferizeendpoints_state;
 	case (builder_maccore_txdatapath_bufferizeendpoints_state)
 		1'd1: begin
@@ -1541,15 +1548,15 @@ end
 assign main_bufferizeendpoints_sink_ready = ((~main_bufferizeendpoints_source_valid) | main_bufferizeendpoints_source_ready);
 assign main_tx_preamble_source_payload_last_be = main_tx_preamble_sink_payload_last_be;
 always @(*) begin
+	main_tx_preamble_source_first <= 1'd0;
+	main_tx_preamble_source_last <= 1'd0;
+	main_tx_preamble_source_payload_data <= 8'd0;
+	main_tx_preamble_source_payload_error <= 1'd0;
 	main_tx_preamble_sink_ready <= 1'd0;
 	builder_maccore_txdatapath_liteethmacpreambleinserter_next_state <= 2'd0;
 	main_tx_preamble_count_clockdomainsrenamer2_next_value <= 3'd0;
 	main_tx_preamble_count_clockdomainsrenamer2_next_value_ce <= 1'd0;
 	main_tx_preamble_source_valid <= 1'd0;
-	main_tx_preamble_source_first <= 1'd0;
-	main_tx_preamble_source_last <= 1'd0;
-	main_tx_preamble_source_payload_data <= 8'd0;
-	main_tx_preamble_source_payload_error <= 1'd0;
 	main_tx_preamble_source_payload_data <= main_tx_preamble_sink_payload_data;
 	builder_maccore_txdatapath_liteethmacpreambleinserter_next_state <= builder_maccore_txdatapath_liteethmacpreambleinserter_state;
 	case (builder_maccore_txdatapath_liteethmacpreambleinserter_state)
@@ -1612,6 +1619,9 @@ always @(*) begin
 	endcase
 end
 always @(*) begin
+	main_tx_gap_source_payload_last_be <= 1'd0;
+	main_tx_gap_source_payload_error <= 1'd0;
+	main_tx_gap_sink_ready <= 1'd0;
 	builder_maccore_txdatapath_liteethmacgap_next_state <= 1'd0;
 	main_tx_gap_counter_clockdomainsrenamer3_next_value <= 4'd0;
 	main_tx_gap_source_valid <= 1'd0;
@@ -1619,9 +1629,6 @@ always @(*) begin
 	main_tx_gap_source_first <= 1'd0;
 	main_tx_gap_source_last <= 1'd0;
 	main_tx_gap_source_payload_data <= 8'd0;
-	main_tx_gap_source_payload_last_be <= 1'd0;
-	main_tx_gap_source_payload_error <= 1'd0;
-	main_tx_gap_sink_ready <= 1'd0;
 	builder_maccore_txdatapath_liteethmacgap_next_state <= builder_maccore_txdatapath_liteethmacgap_state;
 	case (builder_maccore_txdatapath_liteethmacgap_state)
 		1'd1: begin
@@ -1708,11 +1715,11 @@ assign main_pulsesynchronizer1_i = main_rx_crc_error;
 assign main_rx_preamble_source_payload_data = main_rx_preamble_sink_payload_data;
 assign main_rx_preamble_source_payload_last_be = main_rx_preamble_sink_payload_last_be;
 always @(*) begin
-	main_rx_preamble_source_first <= 1'd0;
 	main_rx_preamble_source_payload_error <= 1'd0;
-	builder_maccore_rxdatapath_liteethmacpreamblechecker_next_state <= 1'd0;
 	main_rx_preamble_error <= 1'd0;
+	builder_maccore_rxdatapath_liteethmacpreamblechecker_next_state <= 1'd0;
 	main_rx_preamble_source_valid <= 1'd0;
+	main_rx_preamble_source_first <= 1'd0;
 	main_rx_preamble_sink_ready <= 1'd0;
 	main_rx_preamble_source_last <= 1'd0;
 	builder_maccore_rxdatapath_liteethmacpreamblechecker_next_state <= builder_maccore_rxdatapath_liteethmacpreamblechecker_state;
@@ -1777,8 +1784,8 @@ end
 assign main_rx_crc_crc_data1 = main_rx_crc_crc_data0[7:0];
 assign main_rx_crc_crc_last = main_rx_crc_crc_reg;
 always @(*) begin
-	main_rx_crc_crc_error0 <= 1'd0;
 	main_rx_crc_crc_value <= 32'd0;
+	main_rx_crc_crc_error0 <= 1'd0;
 	if (main_rx_crc_crc_last_be1) begin
 		main_rx_crc_crc_value <= {builder_t_slice_proxy63[0], builder_t_slice_proxy62[1], builder_t_slice_proxy61[2], builder_t_slice_proxy60[3], builder_t_slice_proxy59[4], builder_t_slice_proxy58[5], builder_t_slice_proxy57[6], builder_t_slice_proxy56[7], builder_t_slice_proxy55[8], builder_t_slice_proxy54[9], builder_t_slice_proxy53[10], builder_t_slice_proxy52[11], builder_t_slice_proxy51[12], builder_t_slice_proxy50[13], builder_t_slice_proxy49[14], builder_t_slice_proxy48[15], builder_t_slice_proxy47[16], builder_t_slice_proxy46[17], builder_t_slice_proxy45[18], builder_t_slice_proxy44[19], builder_t_slice_proxy43[20], builder_t_slice_proxy42[21], builder_t_slice_proxy41[22], builder_t_slice_proxy40[23], builder_t_slice_proxy39[24], builder_t_slice_proxy38[25], builder_t_slice_proxy37[26], builder_t_slice_proxy36[27], builder_t_slice_proxy35[28], builder_t_slice_proxy34[29], builder_t_slice_proxy33[30], builder_t_slice_proxy32[31]};
 		main_rx_crc_crc_error0 <= (main_rx_crc_crc_next != 32'd3338984827);
@@ -1851,6 +1858,10 @@ assign main_rx_crc_syncfifo_syncfifo_dout = main_rx_crc_syncfifo_rdport_dat_r;
 assign main_rx_crc_syncfifo_syncfifo_writable = (main_rx_crc_syncfifo_level != 3'd5);
 assign main_rx_crc_syncfifo_syncfifo_readable = (main_rx_crc_syncfifo_level != 1'd0);
 always @(*) begin
+	main_rx_crc_last_be_next_value0 <= 1'd0;
+	main_rx_crc_last_be_next_value_ce0 <= 1'd0;
+	main_rx_crc_crc_error1_next_value1 <= 1'd0;
+	main_rx_crc_crc_error1_next_value_ce1 <= 1'd0;
 	main_rx_crc_fifo_reset <= 1'd0;
 	main_rx_crc_source_source_valid <= 1'd0;
 	main_rx_crc_crc_ce <= 1'd0;
@@ -1863,10 +1874,6 @@ always @(*) begin
 	main_rx_crc_error <= 1'd0;
 	main_rx_crc_syncfifo_source_ready <= 1'd0;
 	builder_maccore_rxdatapath_bufferizeendpoints_next_state <= 2'd0;
-	main_rx_crc_last_be_next_value0 <= 1'd0;
-	main_rx_crc_last_be_next_value_ce0 <= 1'd0;
-	main_rx_crc_crc_error1_next_value1 <= 1'd0;
-	main_rx_crc_crc_error1_next_value_ce1 <= 1'd0;
 	builder_maccore_rxdatapath_bufferizeendpoints_next_state <= builder_maccore_rxdatapath_bufferizeendpoints_state;
 	case (builder_maccore_rxdatapath_bufferizeendpoints_state)
 		1'd1: begin
@@ -2144,12 +2151,12 @@ assign main_sram7_status = main_sram47_source_payload_slot;
 assign main_sram10_status = main_sram48_source_payload_length;
 assign main_wr_data = main_sram4_sink_payload_data;
 always @(*) begin
-	main_sram77_we <= 1'd0;
 	main_sram78_dat_w <= 32'd0;
 	main_sram79_adr <= 9'd0;
 	main_sram81_we <= 1'd0;
 	main_sram75_adr <= 9'd0;
 	main_sram82_dat_w <= 32'd0;
+	main_sram77_we <= 1'd0;
 	case (main_slot)
 		1'd0: begin
 			main_sram75_adr <= main_sram35_length[10:2];
@@ -2208,17 +2215,17 @@ assign main_sram54_dout = main_sram65_dat_r;
 assign main_sram50_writable = (main_sram55_level != 2'd2);
 assign main_sram52_readable = (main_sram55_level != 1'd0);
 always @(*) begin
-	main_sram13_status_liteethmacsramwriter_f_next_value <= 32'd0;
-	main_sram13_status_liteethmacsramwriter_f_next_value_ce <= 1'd0;
-	main_write <= 1'd0;
-	main_sram41_sink_payload_slot <= 1'd0;
-	main_sram42_sink_payload_length <= 11'd0;
 	main_slot_liteethmacsramwriter_next_value <= 1'd0;
 	main_slot_liteethmacsramwriter_next_value_ce <= 1'd0;
 	builder_maccore_liteethmacsramwriter_next_state <= 2'd0;
 	main_sram35_length_liteethmacsramwriter_t_next_value <= 11'd0;
 	main_sram35_length_liteethmacsramwriter_t_next_value_ce <= 1'd0;
 	main_sram37_sink_valid <= 1'd0;
+	main_sram13_status_liteethmacsramwriter_f_next_value <= 32'd0;
+	main_sram13_status_liteethmacsramwriter_f_next_value_ce <= 1'd0;
+	main_write <= 1'd0;
+	main_sram41_sink_payload_slot <= 1'd0;
+	main_sram42_sink_payload_length <= 11'd0;
 	builder_maccore_liteethmacsramwriter_next_state <= builder_maccore_liteethmacsramwriter_state;
 	case (builder_maccore_liteethmacsramwriter_state)
 		1'd1: begin
@@ -2362,14 +2369,14 @@ assign main_sram140_dout = main_sram151_dat_r;
 assign main_sram136_writable = (main_sram141_level != 2'd2);
 assign main_sram138_readable = (main_sram141_level != 1'd0);
 always @(*) begin
+	main_sram107_trigger <= 1'd0;
+	main_sram83_source_valid <= 1'd0;
+	main_read <= 1'd0;
 	builder_maccore_liteethmacsramreader_next_state <= 2'd0;
 	main_sram86_source_last <= 1'd0;
 	main_sram122_length_liteethmacsramreader_next_value <= 11'd0;
 	main_sram122_length_liteethmacsramreader_next_value_ce <= 1'd0;
 	main_sram130_source_ready <= 1'd0;
-	main_sram107_trigger <= 1'd0;
-	main_sram83_source_valid <= 1'd0;
-	main_read <= 1'd0;
 	builder_maccore_liteethmacsramreader_next_state <= builder_maccore_liteethmacsramreader_state;
 	case (builder_maccore_liteethmacsramreader_state)
 		1'd1: begin
@@ -2469,12 +2476,12 @@ assign main_bus_ack = (((main_interface0_ack | main_interface1_ack) | main_inter
 assign main_bus_err = (((main_interface0_err | main_interface1_err) | main_interface2_err) | main_interface3_err);
 assign main_bus_dat_r = (((({32{main_slave_sel_r[0]}} & main_interface0_dat_r) | ({32{main_slave_sel_r[1]}} & main_interface1_dat_r)) | ({32{main_slave_sel_r[2]}} & main_interface2_dat_r)) | ({32{main_slave_sel_r[3]}} & main_interface3_dat_r));
 always @(*) begin
-	builder_maccore_wishbone_ack <= 1'd0;
 	builder_maccore_wishbone_dat_r <= 32'd0;
+	builder_maccore_dat_w <= 32'd0;
 	builder_maccore_adr <= 14'd0;
 	builder_maccore_next_state <= 1'd0;
 	builder_maccore_we <= 1'd0;
-	builder_maccore_dat_w <= 32'd0;
+	builder_maccore_wishbone_ack <= 1'd0;
 	builder_maccore_next_state <= builder_maccore_state;
 	case (builder_maccore_state)
 		1'd1: begin
@@ -2553,8 +2560,8 @@ always @(*) begin
 end
 assign builder_csrbank0_scratch0_r = builder_interface0_bank_bus_dat_w[31:0];
 always @(*) begin
-	builder_csrbank0_scratch0_we <= 1'd0;
 	builder_csrbank0_scratch0_re <= 1'd0;
+	builder_csrbank0_scratch0_we <= 1'd0;
 	if ((builder_csrbank0_sel & (builder_interface0_bank_bus_adr[8:0] == 1'd1))) begin
 		builder_csrbank0_scratch0_re <= builder_interface0_bank_bus_we;
 		builder_csrbank0_scratch0_we <= (~builder_interface0_bank_bus_we);
@@ -2628,8 +2635,8 @@ always @(*) begin
 end
 assign builder_csrbank1_sram_writer_ev_enable0_r = builder_interface1_bank_bus_dat_w[0];
 always @(*) begin
-	builder_csrbank1_sram_writer_ev_enable0_re <= 1'd0;
 	builder_csrbank1_sram_writer_ev_enable0_we <= 1'd0;
+	builder_csrbank1_sram_writer_ev_enable0_re <= 1'd0;
 	if ((builder_csrbank1_sel & (builder_interface1_bank_bus_adr[8:0] == 3'd5))) begin
 		builder_csrbank1_sram_writer_ev_enable0_re <= builder_interface1_bank_bus_we;
 		builder_csrbank1_sram_writer_ev_enable0_we <= (~builder_interface1_bank_bus_we);
@@ -2780,8 +2787,8 @@ always @(*) begin
 end
 assign builder_csrbank2_mdio_w0_r = builder_interface2_bank_bus_dat_w[2:0];
 always @(*) begin
-	builder_csrbank2_mdio_w0_we <= 1'd0;
 	builder_csrbank2_mdio_w0_re <= 1'd0;
+	builder_csrbank2_mdio_w0_we <= 1'd0;
 	if ((builder_csrbank2_sel & (builder_interface2_bank_bus_adr[8:0] == 1'd1))) begin
 		builder_csrbank2_mdio_w0_re <= builder_interface2_bank_bus_we;
 		builder_csrbank2_mdio_w0_we <= (~builder_interface2_bank_bus_we);
@@ -2946,7 +2953,7 @@ always @(*) begin
 		end
 	endcase
 end
-assign builder_xilinxasyncresetsynchronizerimpl0 = (~main_maccore_ethphy_locked);
+assign builder_xilinxasyncresetsynchronizerimpl0 = (~main_maccore_ethphy_pll_locked);
 always @(*) begin
 	main_maccore_ethphy__r_status <= 1'd0;
 	main_maccore_ethphy__r_status <= main_maccore_ethphy_r;
@@ -3181,6 +3188,9 @@ always @(posedge sys_clk) begin
 			main_maccore_maccore_bus_errors <= (main_maccore_maccore_bus_errors + 1'd1);
 		end
 	end
+	if (main_maccore_ethphy_hw_reset_counter_ce) begin
+		main_maccore_ethphy_hw_reset_counter <= (main_maccore_ethphy_hw_reset_counter + 1'd1);
+	end
 	main_tx_cdc_cdc_graycounter0_q_binary <= main_tx_cdc_cdc_graycounter0_q_next_binary;
 	main_tx_cdc_cdc_graycounter0_q <= main_tx_cdc_cdc_graycounter0_q_next;
 	if (main_pulsesynchronizer0_o) begin
@@ -3414,6 +3424,7 @@ always @(posedge sys_clk) begin
 		main_maccore_maccore_bus_errors <= 32'd0;
 		main_maccore_ethphy_reset_storage <= 1'd0;
 		main_maccore_ethphy_reset_re <= 1'd0;
+		main_maccore_ethphy_hw_reset_counter <= 9'd0;
 		main_maccore_ethphy__w_storage <= 3'd0;
 		main_maccore_ethphy__w_re <= 1'd0;
 		main_maccore_ethphy__r_re <= 1'd0;
@@ -3954,7 +3965,7 @@ FDCE FDCE(
 	.C(main_maccore_ethphy_clkin),
 	.CE(1'd1),
 	.CLR(1'd0),
-	.D(main_maccore_ethphy_reset0),
+	.D(main_maccore_ethphy_pll_reset),
 	.Q(builder_maccore_reset0)
 );
 
@@ -4027,12 +4038,12 @@ PLLE2_ADV #(
 ) PLLE2_ADV (
 	.CLKFBIN(builder_maccore_pll_fb),
 	.CLKIN1(main_maccore_ethphy_clkin),
-	.PWRDWN(main_maccore_ethphy_power_down),
+	.PWRDWN(main_maccore_ethphy_pll_power_down),
 	.RST(builder_maccore_reset7),
 	.CLKFBOUT(builder_maccore_pll_fb),
 	.CLKOUT0(main_maccore_ethphy_clkout0),
 	.CLKOUT1(main_maccore_ethphy_clkout1),
-	.LOCKED(main_maccore_ethphy_locked)
+	.LOCKED(main_maccore_ethphy_pll_locked)
 );
 
 (* ars_ff1 = "true", async_reg = "true" *) FDPE #(
@@ -4061,7 +4072,7 @@ PLLE2_ADV #(
 	.C(eth_tx_clk),
 	.CE(1'd1),
 	.D(1'd0),
-	.PRE(main_maccore_ethphy_reset1),
+	.PRE(main_maccore_ethphy_reset),
 	.Q(builder_xilinxasyncresetsynchronizerimpl1_rst_meta)
 );
 
@@ -4071,7 +4082,7 @@ PLLE2_ADV #(
 	.C(eth_tx_clk),
 	.CE(1'd1),
 	.D(builder_xilinxasyncresetsynchronizerimpl1_rst_meta),
-	.PRE(main_maccore_ethphy_reset1),
+	.PRE(main_maccore_ethphy_reset),
 	.Q(eth_tx_rst)
 );
 
@@ -4081,7 +4092,7 @@ PLLE2_ADV #(
 	.C(eth_rx_clk),
 	.CE(1'd1),
 	.D(1'd0),
-	.PRE(main_maccore_ethphy_reset1),
+	.PRE(main_maccore_ethphy_reset),
 	.Q(builder_xilinxasyncresetsynchronizerimpl2_rst_meta)
 );
 
@@ -4091,12 +4102,12 @@ PLLE2_ADV #(
 	.C(eth_rx_clk),
 	.CE(1'd1),
 	.D(builder_xilinxasyncresetsynchronizerimpl2_rst_meta),
-	.PRE(main_maccore_ethphy_reset1),
+	.PRE(main_maccore_ethphy_reset),
 	.Q(eth_rx_rst)
 );
 
 endmodule
 
 // -----------------------------------------------------------------------------
-//  Auto-Generated by LiteX on 2022-09-02 15:55:19.
+//  Auto-Generated by LiteX on 2022-09-06 11:07:46.
 //------------------------------------------------------------------------------
