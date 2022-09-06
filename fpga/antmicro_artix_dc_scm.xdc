@@ -363,6 +363,24 @@ set_property IOSTANDARD LVCMOS33 [get_ports {eth_tx_data[2]}]
 set_property LOC J21 [get_ports {eth_tx_data[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {eth_tx_data[3]}]
 
+################################################################################
+# eMMC
+################################################################################
+
+# Board has pullup resistors
+# litesdcard only uses 4 data bits
+set_property -dict { PACKAGE_PIN P17 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_data[0] }];
+set_property -dict { PACKAGE_PIN W17 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_data[1] }];
+set_property -dict { PACKAGE_PIN R18 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_data[2] }];
+set_property -dict { PACKAGE_PIN V18 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_data[3] }];
+set_property -dict { PACKAGE_PIN U18 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_data[4] }];
+set_property -dict { PACKAGE_PIN U17 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_data[5] }];
+set_property -dict { PACKAGE_PIN T18 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_data[6] }];
+set_property -dict { PACKAGE_PIN R17 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_data[7] }];
+
+set_property -dict { PACKAGE_PIN Y19 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_cmd }];
+set_property -dict { PACKAGE_PIN Y18 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_clk }];
+set_property -dict { PACKAGE_PIN V19 IOSTANDARD LVCMOS33 SLEW FAST } [get_ports { sdcard_rstn }];
 
 
 ################################################################################

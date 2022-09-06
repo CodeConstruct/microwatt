@@ -27,7 +27,7 @@ entity toplevel is
         USE_LITEETH        : boolean  := false;
         UART_IS_16550      : boolean  := false;
         HAS_UART1          : boolean  := true;
-        USE_LITESDCARD     : boolean := false;
+        USE_LITESDCARD     : boolean := true;
         HAS_GPIO           : boolean := true;
         NGPIO              : natural := 32
         );

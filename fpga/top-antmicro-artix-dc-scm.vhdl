@@ -27,7 +27,7 @@ entity toplevel is
         USE_LITEETH        : boolean  := true;
         UART_IS_16550      : boolean  := false;
         HAS_UART1          : boolean  := true;
-        USE_LITESDCARD     : boolean := false;
+        USE_LITESDCARD     : boolean := true;
         HAS_GPIO           : boolean := true;
         NGPIO              : natural := 32
         );
@@ -62,6 +62,16 @@ entity toplevel is
         eth_rx_data      : in std_ulogic_vector(3 downto 0);
         eth_tx_ctl       : out std_ulogic;
         eth_tx_data      : out std_ulogic_vector(3 downto 0);
+
+        -- SD card
+        -- note that only 4 bits are used by litesdcard
+        sdcard_data   : inout std_ulogic_vector(7 downto 0);
+        sdcard_cmd    : inout std_ulogic;
+        sdcard_clk    : out   std_ulogic;
+        -- rst_n is disabled until host sets a register to enable,
+        -- see eMMC chip datasheet.
+        -- sdcard_rstn is unused by litesdcard
+        sdcard_rstn   : out   std_ulogic;
 
         -- DRAM wires
         ddram_a       : out std_ulogic_vector(14 downto 0);
@@ -98,7 +108,7 @@ architecture behaviour of toplevel is
     signal wb_ext_is_dram_csr  : std_ulogic;
     signal wb_ext_is_dram_init : std_ulogic;
     signal wb_ext_is_eth       : std_ulogic;
-
+    signal wb_ext_is_sdcard    : std_ulogic;
 
     -- DRAM main data wishbone connection
     signal wb_dram_in          : wishbone_master_out;
@@ -236,7 +246,7 @@ begin
             wb_ext_is_dram_csr   => wb_ext_is_dram_csr,
             wb_ext_is_dram_init  => wb_ext_is_dram_init,
             wb_ext_is_eth        => wb_ext_is_eth,
---            wb_ext_is_sdcard     => ,
+            wb_ext_is_sdcard     => wb_ext_is_sdcard,
 
             -- DMA wishbone
             wishbone_dma_in      => wb_sddma_in,
@@ -489,15 +499,113 @@ begin
         ext_irq_eth    <= '0';
     end generate;
 
+    has_sdcard : if USE_LITESDCARD generate
+        component litesdcard_core port (
+            clk           : in    std_ulogic;
+            rst           : in    std_ulogic;
+            -- wishbone for accessing control registers
+            wb_ctrl_adr   : in    std_ulogic_vector(29 downto 0);
+            wb_ctrl_dat_w : in    std_ulogic_vector(31 downto 0);
+            wb_ctrl_dat_r : out   std_ulogic_vector(31 downto 0);
+            wb_ctrl_sel   : in    std_ulogic_vector(3 downto 0);
+            wb_ctrl_cyc   : in    std_ulogic;
+            wb_ctrl_stb   : in    std_ulogic;
+            wb_ctrl_ack   : out   std_ulogic;
+            wb_ctrl_we    : in    std_ulogic;
+            wb_ctrl_cti   : in    std_ulogic_vector(2 downto 0);
+            wb_ctrl_bte   : in    std_ulogic_vector(1 downto 0);
+            wb_ctrl_err   : out   std_ulogic;
+            -- wishbone for SD card core to use for DMA
+            wb_dma_adr    : out   std_ulogic_vector(29 downto 0);
+            wb_dma_dat_w  : out   std_ulogic_vector(31 downto 0);
+            wb_dma_dat_r  : in    std_ulogic_vector(31 downto 0);
+            wb_dma_sel    : out   std_ulogic_vector(3 downto 0);
+            wb_dma_cyc    : out   std_ulogic;
+            wb_dma_stb    : out   std_ulogic;
+            wb_dma_ack    : in    std_ulogic;
+            wb_dma_we     : out   std_ulogic;
+            wb_dma_cti    : out   std_ulogic_vector(2 downto 0);
+            wb_dma_bte    : out   std_ulogic_vector(1 downto 0);
+            wb_dma_err    : in    std_ulogic;
+            -- connections to SD card
+            sdcard_data   : inout std_ulogic_vector(3 downto 0);
+            sdcard_cmd    : inout std_ulogic;
+            sdcard_clk    : out   std_ulogic;
+            sdcard_cd     : in    std_ulogic;
+            irq           : out   std_ulogic
+            );
+        end component;
+
+        signal wb_sdcard_cyc : std_ulogic;
+        signal wb_sdcard_adr : std_ulogic_vector(29 downto 0);
+
+    begin
+        litesdcard : litesdcard_core
+            port map (
+                clk           => system_clk,
+                rst           => soc_rst,
+                wb_ctrl_adr   => wb_sdcard_adr,
+                wb_ctrl_dat_w => wb_ext_io_in.dat,
+                wb_ctrl_dat_r => wb_sdcard_out.dat,
+                wb_ctrl_sel   => wb_ext_io_in.sel,
+                wb_ctrl_cyc   => wb_sdcard_cyc,
+                wb_ctrl_stb   => wb_ext_io_in.stb,
+                wb_ctrl_ack   => wb_sdcard_out.ack,
+                wb_ctrl_we    => wb_ext_io_in.we,
+                wb_ctrl_cti   => "000",
+                wb_ctrl_bte   => "00",
+                wb_ctrl_err   => open,
+                wb_dma_adr    => wb_sddma_nr.adr,
+                wb_dma_dat_w  => wb_sddma_nr.dat,
+                wb_dma_dat_r  => wb_sddma_ir.dat,
+                wb_dma_sel    => wb_sddma_nr.sel,
+                wb_dma_cyc    => wb_sddma_nr.cyc,
+                wb_dma_stb    => wb_sddma_nr.stb,
+                wb_dma_ack    => wb_sddma_ir.ack,
+                wb_dma_we     => wb_sddma_nr.we,
+                wb_dma_cti    => open,
+                wb_dma_bte    => open,
+                wb_dma_err    => '0',
+                sdcard_data   => sdcard_data(3 downto 0),
+                sdcard_cmd    => sdcard_cmd,
+                sdcard_clk    => sdcard_clk,
+                sdcard_cd     => '1',
+                irq           => ext_irq_sdcard
+                );
+
+        -- Gate cyc with chip select from SoC
+        wb_sdcard_cyc <= wb_ext_io_in.cyc and wb_ext_is_sdcard;
+
+        wb_sdcard_adr <= x"0000" & wb_ext_io_in.adr(13 downto 0);
+
+        wb_sdcard_out.stall <= not wb_sdcard_out.ack;
+
+        -- Convert non-pipelined DMA wishbone to pipelined by suppressing
+        -- non-acknowledged strobes
+        process(system_clk)
+        begin
+            if rising_edge(system_clk) then
+                wb_sddma_out <= wb_sddma_nr;
+                if wb_sddma_stb_sent = '1' or
+                    (wb_sddma_out.stb = '1' and wb_sddma_in.stall = '0') then
+                    wb_sddma_out.stb <= '0';
+                end if;
+                if wb_sddma_nr.cyc = '0' or wb_sddma_ir.ack = '1' then
+                    wb_sddma_stb_sent <= '0';
+                elsif wb_sddma_in.stall = '0' then
+                    wb_sddma_stb_sent <= wb_sddma_nr.stb;
+                end if;
+                wb_sddma_ir <= wb_sddma_in;
+            end if;
+        end process;
+
+    end generate;
 
     -- Mux WB response on the IO bus
     wb_ext_io_out <= wb_eth_out when wb_ext_is_eth = '1' else
+                     wb_sdcard_out when wb_ext_is_sdcard = '1' else
                      wb_dram_ctrl_out;
 
-    wb_sdcard_out.ack <= '0';
-    wb_sdcard_out.stall <= '0';
-
-    ext_irq_sdcard <= '0';
 
     ext_rst_n <= '1';
 
