@@ -40,6 +40,15 @@ def read(cable, config, flash_proxy, data, set_qe=False):
     print(script)
     subprocess.call(["openocd", "-f", cable, "-f", config, "-c", script])
 
+def reset(cable, config):
+    script = "; ".join([
+        "init",
+        "fpga_program",
+        "exit"
+    ])
+    print(script)
+    subprocess.call(["openocd", "-f", cable, "-f", config, "-c", script])
+
 def get_version():
     a = subprocess.run(["openocd", "-v"], capture_output=True)
     if a.returncode != 0:
@@ -52,12 +61,13 @@ def get_version():
         return "_openocd_v0.11"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("file", help="file to write to flash")
+parser.add_argument("file", nargs='?', help="file to write to flash")
 parser.add_argument("-a", "--address", help="offset in flash", type=lambda x: int(x,0), default=0)
 parser.add_argument("-f", "--fpga", help="a35, a100 or a200", default="a35")
 parser.add_argument("-t", "--filetype", help="file type such as 'bin'", default="")
 parser.add_argument("-c", "--cable", help="cable type such as 'arty'", default="arty")
 parser.add_argument("-r", "--read", help="read flash", action="store_true")
+parser.add_argument("-x", "--reset", help="reset", action="store_true")
 parser.add_argument("-l", "--load", help="load bitstream to fpga (not flash)", action="store_true")
 args = parser.parse_args()
 
@@ -73,7 +83,15 @@ elif args.fpga.lower() == "k325":
         proxy = "bscan_spi_xc7k325t{}.bit".format(version)
 else:
     print("error: specify a35, a100, a200 or k325 when flashing")
-    sys.exit()
+    sys.exit(1)
+
+if sum(int(x) for x in [args.read, args.load, args.reset]) > 1:
+    print("error: only one of read/reset/load can be used")
+    sys.exit(1)
+
+if not args.reset and args.file is None:
+    print("error: missing required 'file' argument")
+    sys.exit(1)
 
 proxy = os.path.join(BASE, proxy)
 config = os.path.join(BASE, "xilinx-xc7{}.cfg".format(version))
@@ -83,5 +101,7 @@ if args.read:
     read(cable, config, proxy, args.address, args.file)
 elif args.load:
     load(cable, config, args.file)
+elif args.reset:
+    reset(cable, config)
 else:
     flash(cable, config, proxy, args.address, args.file, args.filetype.lower())
