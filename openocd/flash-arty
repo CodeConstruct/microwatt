@@ -20,7 +20,7 @@ def flash(cable, config, flash_proxy, address, data, filetype="", set_qe=False):
     subprocess.call(["openocd", "-f", cable, "-f", config, "-c", script])
 
 # Loads a bitstream directly to fpga, not flash
-def load(cable, config, flash_proxy, data, set_qe=False):
+def load(cable, config, data):
     script = "; ".join([
         "init",
         f"pld load 0 {data}",
@@ -33,6 +33,7 @@ def read(cable, config, flash_proxy, data, set_qe=False):
     script = "; ".join([
         "init",
         "jtagspi_init 0 {{{}}}".format(flash_proxy),
+        "jtagspi set_qe 0 1" if set_qe else "",
         f"flash read_bank 0 {data}",
         "exit"
     ])
@@ -81,6 +82,6 @@ cable = os.path.join(BASE, "{}.cfg".format(args.cable))
 if args.read:
     read(cable, config, proxy, args.address, args.file)
 elif args.load:
-    load(cable, config, proxy, args.file)
+    load(cable, config, args.file)
 else:
     flash(cable, config, proxy, args.address, args.file, args.filetype.lower())
