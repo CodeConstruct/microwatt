@@ -367,7 +367,7 @@ targets:
       - clk_frequency
       - disable_flatten_core
       - no_bram
-      - log_length=2048
+      - log_length=0
       - uart_is_16550
       - has_uart1
       - has_fpu
