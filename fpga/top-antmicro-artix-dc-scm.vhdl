@@ -40,14 +40,38 @@ entity toplevel is
         uart_main_rx : in  std_ulogic;
 
         -- for litescope debug uart
-        tpm_pirq : out std_ulogic;
-        tpm_pp  : in std_ulogic;
+
+        -- TPM header used for gpio rework or litescope
+        spi0_cs_n  : inout std_ulogic;
+        spi0_mosi  : inout std_ulogic;
+        spi0_miso  : inout std_ulogic;
+        spi0_clk  : inout std_ulogic;
+        tpm_pirq : inout std_ulogic;
+        tpm_rst  : inout std_ulogic;
+        tpm_gpio : inout std_ulogic;
+        tpm_pp  : inout std_ulogic;
 
         -- LEDs
-        d11_led : out std_ulogic;
-        d12_led : out std_ulogic;
-        d13_led : out std_ulogic;
+        usr_led : out std_ulogic_vector(2 downto 0);
+        -- old names - these didn't seem to be working?
+        --d11_led : out std_ulogic;
+        --d12_led : out std_ulogic;
+        --d13_led : out std_ulogic;
 
+        -- GPIO
+        sys_pwrbtn_n : inout std_ulogic;
+        sys_pwrok : inout std_ulogic;
+        hpm_stby_en : inout std_ulogic;
+        fsi_clk : inout std_ulogic;
+        fsi_dat : inout std_ulogic;
+        bmc_fsi_in_ena : inout std_ulogic;
+
+        -- I2C
+        i2c_scl : inout std_ulogic_vector(12 downto 0);
+        i2c_sda : inout std_ulogic_vector(12 downto 0);
+
+        -- incorrect wiring, actually goes to i2c5_sda, edge A12
+        -- pcie_bmc_clk_100_p : inout std_ulogic;
 
         -- SPI
         spi_flash_cs_n   : out std_ulogic;
@@ -330,9 +354,9 @@ begin
 
 	core_alt_reset <= '0';
 
-        d11_led <= '0';
-        d12_led <= soc_rst;
-        d13_led <= system_clk;
+        --d11_led <= '0';
+        --d12_led <= soc_rst;
+        --d13_led <= system_clk;
 
         -- Vivado barfs on those differential signals if left
         -- unconnected. So instanciate a diff. buffer and feed
@@ -431,9 +455,9 @@ begin
                 ddram_reset_n   => ddram_reset_n
                 );
 
-        d11_led <= not dram_init_done;
-        d12_led <= soc_rst;
-        d13_led <= dram_init_error;
+        --d11_led <= not dram_init_done;
+        --d12_led <= soc_rst;
+        --d13_led <= dram_init_error;
 
     end generate;
 
@@ -624,5 +648,123 @@ begin
 
 
     ext_rst_n <= '1';
+
+    usr_led(0) <= gpio_out(0) when gpio_dir(0) = '1' else 'Z';
+    usr_led(1) <= gpio_out(1) when gpio_dir(1) = '1' else 'Z';
+    usr_led(2) <= gpio_out(2) when gpiob_dir(2) = '1' else 'Z';
+
+    sys_pwrbtn_n <= gpio_out(8) when gpio_dir(8) = '1' else 'Z';
+    gpio_in(8) <= sys_pwrbtn_n;
+
+    sys_pwrok <= gpio_out(9) when gpio_dir(9) = '1' else 'Z';
+    gpio_in(9) <= sys_pwrok;
+
+    hpm_stby_en <= gpio_out(10) when gpio_dir(10) = '1' else 'Z';
+    gpio_in(10) <= hpm_stby_en;
+
+    -- spare pins J4 TPM header. Used for rework.
+    -- pin 1
+    spi0_cs_n <= gpio_out(16) when gpio_dir(16) = '1' else 'Z';
+    gpio_in(16) <= spi0_cs_n;
+    -- 2
+    spi0_mosi <= gpio_out(17) when gpio_dir(17) = '1' else 'Z';
+    gpio_in(17) <= spi0_mosi;
+    -- 3 - used for litescope
+    --spi0_miso <= gpio_out(18) when gpio_dir(18) = '1' else 'Z';
+    --gpio_in(18) <= spi0_miso;
+    -- 4 - used for litescope
+    --spi0_clk <= gpio_out(19) when gpio_dir(19) = '1' else 'Z';
+    --gpio_in(19) <= spi0_clk;
+    -- 7
+    tpm_pirq <= gpio_out(20) when gpio_dir(20) = '1' else 'Z';
+    gpio_in(20) <= tpm_pirq;
+    -- 8
+    tpm_rst <= gpio_out(21) when gpio_dir(21) = '1' else 'Z';
+    gpio_in(21) <= tpm_rst;
+    -- 9
+    tpm_gpio <= gpio_out(22) when gpio_dir(22) = '1' else 'Z';
+    gpio_in(22) <= tpm_gpio;
+    -- 10
+    tpm_pp <= gpio_out(23) when gpio_dir(23) = '1' else 'Z';
+    gpio_in(23) <= tpm_pp;
+
+    gpio_in(30) <= '0';
+    gpio_in(31) <= '1';
+
+    -- FSI
+    fsi_clk <= gpio_out(24) when gpio_dir(24) = '1' else 'Z';
+    gpio_in(24) <= fsi_clk;
+    fsi_dat <= gpio_out(25) when gpio_dir(25) = '1' else 'Z';
+    gpio_in(25) <= fsi_dat;
+    bmc_fsi_in_ena <= gpio_out(26) when gpio_dir(26) = '1' else 'Z';
+    gpio_in(26) <= bmc_fsi_in_ena;
+
+    ---- I2C lines
+    --i2c_gpios: for i in 0 to 12 generate
+    --begin
+    --    -- i2c0 and i2c5 are not available through the interposer
+    --    i2c_valid_gpios: if not (i = 0 or i = 5) generate
+    --    begin
+    --        i2c_scl(i) <= gpiob_out(2*i) when gpiob_dir(2*i) = '1' else 'Z';
+    --        gpiob_in(2*i) <= i2c_scl(i);
+    --        i2c_sda(i) <= gpiob_out(2*i+1) when gpiob_dir(2*i+1) = '1' else 'Z';
+    --        gpiob_in(2*i+1) <= i2c_sda(i);
+    --    end generate;
+    --end generate;
+
+    i2c_scl(3) <= gpiob_out(6) when gpiob_dir(6) = '1' else 'Z';
+    gpiob_in(6) <= i2c_scl(3);
+    i2c_sda(3) <= gpiob_out(7) when gpiob_dir(7) = '1' else 'Z';
+    gpiob_in(7) <= i2c_sda(3);
+
+    i2c_scl(4) <= gpiob_out(8) when gpiob_dir(8) = '1' else 'Z';
+    gpiob_in(8) <= i2c_scl(4);
+    i2c_sda(4) <= gpiob_out(9) when gpiob_dir(9) = '1' else 'Z';
+    gpiob_in(9) <= i2c_sda(4);
+
+    -- scl5 was wired incorrectly, use rework gpio instead
+    --i2c_scl(5) <= gpiob_out(10) when gpiob_dir(10) = '1' else 'Z';
+    --gpiob_in(10) <= i2c_scl(5);
+
+    -- sda5 edge connector A12 goes to pcie_bmc_clk_100_p
+    -- pcie_bmc_clk_100_p <= gpiob_out(11) when gpiob_dir(11) = '1' else 'Z';
+    -- gpiob_in(11) <= pcie_bmc_clk_100_p;
+
+    i2c_scl(6) <= gpiob_out(12) when gpiob_dir(12) = '1' else 'Z';
+    gpiob_in(12) <= i2c_scl(6);
+    i2c_sda(6) <= gpiob_out(13) when gpiob_dir(13) = '1' else 'Z';
+    gpiob_in(13) <= i2c_sda(6);
+
+    -- sda and scl are swapped by the interposer, we swap back here
+    i2c_sda(10) <= gpiob_out(20) when gpiob_dir(20) = '1' else 'Z';
+    gpiob_in(20) <= i2c_sda(10);
+    i2c_scl(10) <= gpiob_out(21) when gpiob_dir(21) = '1' else 'Z';
+    gpiob_in(21) <= i2c_scl(10);
+
+    -- sda and scl are swapped by the interposer, we swap back here
+    i2c_sda(11) <= gpiob_out(22) when gpiob_dir(22) = '1' else 'Z';
+    gpiob_in(22) <= i2c_sda(11);
+    i2c_scl(11) <= gpiob_out(23) when gpiob_dir(23) = '1' else 'Z';
+    gpiob_in(23) <= i2c_scl(11);
+
+    i2c_scl(12) <= gpiob_out(24) when gpiob_dir(24) = '1' else 'Z';
+    gpiob_in(24) <= i2c_scl(12);
+    i2c_sda(12) <= gpiob_out(25) when gpiob_dir(25) = '1' else 'Z';
+    gpiob_in(25) <= i2c_sda(12);
+
+    -- host i2c13 uses dcscm i2c2
+    i2c_scl(2) <= gpiob_out(26) when gpiob_dir(26) = '1' else 'Z';
+    gpiob_in(26) <= i2c_scl(2);
+    i2c_sda(2) <= gpiob_out(27) when gpiob_dir(27) = '1' else 'Z';
+    gpiob_in(27) <= i2c_sda(2);
+
+    -- host i2c14 uses dcscm i2c1
+    i2c_scl(1) <= gpiob_out(28) when gpiob_dir(28) = '1' else 'Z';
+    gpiob_in(28) <= i2c_scl(1);
+    i2c_sda(1) <= gpiob_out(29) when gpiob_dir(29) = '1' else 'Z';
+    gpiob_in(29) <= i2c_sda(1);
+
+    i2c_scl <= (others => 'Z');
+    i2c_sda <= (others => 'Z');
 
 end architecture behaviour;

@@ -7,15 +7,88 @@ set_property -dict { PACKAGE_PIN C18  IOSTANDARD LVCMOS33 } [get_ports { ext_clk
 set_property -dict { PACKAGE_PIN R19 IOSTANDARD LVCMOS33 } [get_ports { uart_main_tx }];
 set_property -dict { PACKAGE_PIN P19  IOSTANDARD LVCMOS33 } [get_ports { uart_main_rx }];
 
-set_property -dict { PACKAGE_PIN T20 IOSTANDARD LVCMOS33 } [get_ports { d11_led }];
-set_property -dict { PACKAGE_PIN U20 IOSTANDARD LVCMOS33 } [get_ports { d12_led }];
-set_property -dict { PACKAGE_PIN W20 IOSTANDARD LVCMOS33 } [get_ports { d13_led }];
+#set_property -dict { PACKAGE_PIN T20 IOSTANDARD LVCMOS33 } [get_ports { d11_led }];
+#set_property -dict { PACKAGE_PIN U20 IOSTANDARD LVCMOS33 } [get_ports { d12_led }];
+#set_property -dict { PACKAGE_PIN W20 IOSTANDARD LVCMOS33 } [get_ports { d13_led }];
 
-# J4 header (same shape as pmod)
+################################################################################
+# User LEDs
+################################################################################
+set_property -dict { PACKAGE_PIN T20 IOSTANDARD LVCMOS33 } [get_ports {usr_led[0]}];
+set_property -dict { PACKAGE_PIN U20 IOSTANDARD LVCMOS33 } [get_ports {usr_led[1]}];
+set_property -dict { PACKAGE_PIN W20 IOSTANDARD LVCMOS33 } [get_ports {usr_led[2]}];
+
+################################################################################
+# DC-SCM GPIOs from spec
+################################################################################
+set_property -dict { PACKAGE_PIN U2 IOSTANDARD LVCMOS33 } [get_ports { sys_pwrbtn_n }];
+set_property -dict { PACKAGE_PIN V3 IOSTANDARD LVCMOS33 } [get_ports { sys_pwrok }];
+set_property -dict { PACKAGE_PIN V17 IOSTANDARD LVCMOS33 } [get_ports { hpm_stby_en }];
+
+################################################################################
+# Platform specific GPIOs
+################################################################################
+set_property -dict { PACKAGE_PIN D19 IOSTANDARD LVCMOS33 } [get_ports { fsi_clk }];
+set_property -dict { PACKAGE_PIN F18 IOSTANDARD LVCMOS33 } [get_ports { fsi_dat }];
+set_property -dict { PACKAGE_PIN U1 IOSTANDARD LVCMOS33 } [get_ports { bmc_fsi_in_ena }];
+
+################################################################################
+# TPM J4 header, for GPIO rework and litescope
+################################################################################
+set_property -dict { PACKAGE_PIN D16 IOSTANDARD LVCMOS33 } [get_ports { spi0_cs_n }]; # 1
+set_property -dict { PACKAGE_PIN A16 IOSTANDARD LVCMOS33 } [get_ports { spi0_mosi }]; # 2
+set_property -dict { PACKAGE_PIN B16 IOSTANDARD LVCMOS33 } [get_ports { spi0_miso }]; # 3
+set_property -dict { PACKAGE_PIN E16 IOSTANDARD LVCMOS33 } [get_ports { spi0_clk }]; #  4
 set_property -dict { PACKAGE_PIN G17 IOSTANDARD LVCMOS33 } [get_ports { tpm_pirq }]; #  7
-#set_property -dict { PACKAGE_PIN V22 IOSTANDARD LVCMOS33 } [get_ports { tpm_rst }];  #  8
-#set_property -dict { PACKAGE_PIN Y21 IOSTANDARD LVCMOS33 } [get_ports { tpm_gpio }]; #  9
+set_property -dict { PACKAGE_PIN V22 IOSTANDARD LVCMOS33 } [get_ports { tpm_rst }]; # 8
+set_property -dict { PACKAGE_PIN Y21 IOSTANDARD LVCMOS33 } [get_ports { tpm_gpio }]; #  9
 set_property -dict { PACKAGE_PIN G18 IOSTANDARD LVCMOS33 } [get_ports { tpm_pp }];   #  10
+
+################################################################################
+# Connects to edge connector A12
+# Unused, A12 edge connector should be i2c5 instead.
+################################################################################
+# set_property -dict { PACKAGE_PIN F6 IOSTANDARD LVCMOS33 } [get_ports { pcie_bmc_clk_100_p }];
+
+################################################################################
+# I2C - as numbered on dc-scm schematic
+################################################################################
+# not exposed by interposer
+set_property -dict { PACKAGE_PIN J16 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[0]}];
+set_property -dict { PACKAGE_PIN J15 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[0]}];
+
+set_property -dict { PACKAGE_PIN L15 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[1]}];
+set_property -dict { PACKAGE_PIN M15 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[1]}];
+set_property -dict { PACKAGE_PIN L14 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[2]}];
+set_property -dict { PACKAGE_PIN J14 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[2]}];
+set_property -dict { PACKAGE_PIN K14 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[3]}];
+set_property -dict { PACKAGE_PIN M13 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[3]}];
+set_property -dict { PACKAGE_PIN K13 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[4]}];
+set_property -dict { PACKAGE_PIN L13 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[4]}];
+
+# incorrect pins on dcscm. scl was to ground, has been disconnected
+set_property -dict { PACKAGE_PIN N13 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[5]}];
+# i2c_sda5 on edge A12 now uses pcie_bmc_clk_100_p, see above
+set_property -dict { PACKAGE_PIN N14 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[5]}];
+
+set_property -dict { PACKAGE_PIN H13 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[6]}];
+set_property -dict { PACKAGE_PIN G13 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[6]}];
+set_property -dict { PACKAGE_PIN F13 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[7]}];
+set_property -dict { PACKAGE_PIN E13 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[7]}];
+set_property -dict { PACKAGE_PIN C13 IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[8]}];
+set_property -dict { PACKAGE_PIN C14 IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[8]}];
+
+# note that interposer swaps scl/sda, swapped back in vhdl
+set_property -dict { PACKAGE_PIN T5  IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[9]}];
+set_property -dict { PACKAGE_PIN T6  IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[9]}];
+# note that interposer swaps scl/sda, swapped back in vhdl
+set_property -dict { PACKAGE_PIN U6  IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[10]}];
+set_property -dict { PACKAGE_PIN W6  IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[10]}];
+
+set_property -dict { PACKAGE_PIN W7  IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[11]}];
+set_property -dict { PACKAGE_PIN W9  IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[11]}];
+set_property -dict { PACKAGE_PIN V8  IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[12]}];
+set_property -dict { PACKAGE_PIN V9  IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[12]}];
 
 ################################################################################
 # SPI Flash
