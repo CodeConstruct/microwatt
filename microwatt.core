@@ -53,6 +53,7 @@ filesets:
       - spi_rxtx.vhdl
       - spi_flash_ctrl.vhdl
       - git.vhdl
+      - lpc/lpc.v        : {file_type : verilogSource}
     file_type : vhdlSource-2008
 
   fpga:
@@ -372,6 +373,7 @@ targets:
       - has_uart1
       - has_fpu
       - has_btc
+      - has_lpc=true
     generate: [litedram_nexys_video, liteeth_antmicro_artix_dc_scm, litesdcard_nexys_video, git_hash]
     tools:
       vivado: {part : xc7a100tfgg484-1}
@@ -541,6 +543,12 @@ parameters:
     description : Include a branch target cache in the core
     paramtype   : generic
     default     : true
+
+  has_lpc:
+    datatype    : bool
+    description : Include an LPC slave in the SOC
+    paramtype   : generic
+    default     : false
 
   disable_flatten_core:
     datatype    : bool

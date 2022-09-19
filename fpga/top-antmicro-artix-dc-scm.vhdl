@@ -28,6 +28,7 @@ entity toplevel is
         UART_IS_16550      : boolean  := false;
         HAS_UART1          : boolean  := true;
         USE_LITESDCARD     : boolean := true;
+        HAS_LPC            : boolean := true;
         HAS_GPIO           : boolean := true;
         NGPIO              : natural := 32;
         NGPIOB             : natural := 32
@@ -38,8 +39,6 @@ entity toplevel is
         -- UART0 signals:
         uart_main_tx : out std_ulogic;
         uart_main_rx : in  std_ulogic;
-
-        -- for litescope debug uart
 
         -- TPM header used for gpio rework or litescope
         spi0_cs_n  : inout std_ulogic;
@@ -199,6 +198,19 @@ architecture behaviour of toplevel is
     signal ddram_clk_p_vec : std_logic_vector(0 downto 0);
     signal ddram_clk_n_vec : std_logic_vector(0 downto 0);
 
+    -- LPC
+    signal lpc_data_o        : std_ulogic_vector(3 downto 0);
+    -- XXX matt - why reg?
+    signal lpc_data_o_reg    : std_ulogic_vector(3 downto 0);
+    signal lpc_data_oe       : std_ulogic;
+    signal lpc_data_i        : std_ulogic_vector(3 downto 0);
+    signal lpc_irq_o         : std_ulogic;
+    signal lpc_irq_oe        : std_ulogic;
+    signal lpc_irq_i         : std_ulogic;
+    --signal lpc_frame_n       : std_ulogic;
+    signal lpc_reset_n       : std_ulogic;
+    signal lpc_clock         : std_ulogic;
+
     -- Fixup various memory sizes based on generics
     function get_bram_size return natural is
     begin
@@ -245,6 +257,7 @@ begin
             UART0_IS_16550     => UART_IS_16550,
             HAS_UART1          => HAS_UART1,
             HAS_SD_CARD        => USE_LITESDCARD,
+            HAS_LPC            => HAS_LPC,
             HAS_GPIO           => HAS_GPIO,
             NGPIO              => NGPIO,
             HAS_GPIOB          => true,
@@ -280,6 +293,17 @@ begin
             gpiob_out          => gpiob_out,
             gpiob_dir          => gpiob_dir,
 
+            -- LPC
+            lpc_data_o        => lpc_data_o,
+            lpc_data_oe       => lpc_data_oe,
+            lpc_data_i        => lpc_data_i,
+            lpc_frame_n       => lpc_frame_n,
+            lpc_reset_n       => lpc_bmc_rst_n,
+            lpc_clock         => lpc_bmc_clk33,
+            lpc_irq_o         => lpc_irq_o,
+            lpc_irq_oe        => lpc_irq_oe,
+            lpc_irq_i         => lpc_irq_i,
+
             -- External interrupts
             ext_irq_eth       => ext_irq_eth,
             ext_irq_sdcard    => ext_irq_sdcard,
@@ -303,6 +327,19 @@ begin
             alt_reset            => core_alt_reset
             );
 
+    -- LPC
+    lpc_clock <= lpc_bmc_clk33;
+    lpc_data_i <= lpc_lad;
+    lpc_data_o_reg <= lpc_data_o;
+    lpc_lad <= lpc_data_o_reg when lpc_data_oe = '1' and ext_rst_n = '1' else "ZZZZ";
+    lpc_reset_n <= lpc_bmc_rst_n;
+    --lpc_frame_n <= lpc_frame_n;
+
+    -- not exposed by lpc gateware, is just part of soc
+    -- would be bmc_serirq aka ESPI_ALERT_N
+    --bmc_serirq <= lpc_irq_o  when lpc_irq_oe  = '1' and ext_rst_n = '1' else 'Z';
+    --lpc_irq_i <= bmc_serirq
+    lpc_irq_i <= '0';
 
     -- SPI Flash
     --
@@ -775,11 +812,5 @@ begin
 
     i2c_scl <= (others => 'Z');
     i2c_sda <= (others => 'Z');
-
-    scope_data <= lpc_lad;
-    -- XXX hook up properly once add gateware
-    scope_data_oe <= '0';
-    scope_frame_n <= lpc_frame_n;
-    scope_clk <= lpc_bmc_clk33;
 
 end architecture behaviour;
