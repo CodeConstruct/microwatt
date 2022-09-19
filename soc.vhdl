@@ -25,6 +25,7 @@ use work.wishbone_types.all;
 -- 0xc0005000: XICS ICS
 -- 0xc0006000: SPI Flash controller
 -- 0xc0007000: GPIO controller
+-- 0xc0008000: GPIOB controller
 -- 0xc8nnnnnn: External IO bus
 -- 0xf0000000: Flash "ROM" mapping
 -- 0xff000000: DRAM init code (if any) or flash ROM (**)
@@ -50,6 +51,7 @@ use work.wishbone_types.all;
 --   2  : UART1
 --   3  : SD card
 --   4  : GPIO
+--   5  : GPIOB
 
 entity soc is
     generic (
@@ -82,8 +84,11 @@ entity soc is
         DCACHE_TLB_SET_SIZE : natural := 64;
         DCACHE_TLB_NUM_WAYS : natural := 2;
         HAS_SD_CARD        : boolean := false;
+        -- HAS_GPIO refers to gpioa. TODO move GPIOB into gpio.vhdl
         HAS_GPIO           : boolean := false;
-        NGPIO              : natural := 32
+        NGPIO              : natural := 32;
+        HAS_GPIOB          : boolean := false;
+        NGPIOB             : natural := 32
 	);
     port(
 	rst          : in  std_ulogic;
@@ -128,6 +133,10 @@ entity soc is
         gpio_out : out std_ulogic_vector(NGPIO - 1 downto 0);
         gpio_dir : out std_ulogic_vector(NGPIO - 1 downto 0);
         gpio_in  : in  std_ulogic_vector(NGPIO - 1 downto 0) := (others => '0');
+
+        gpiob_out : out std_ulogic_vector(NGPIOB - 1 downto 0);
+        gpiob_dir : out std_ulogic_vector(NGPIOB - 1 downto 0);
+        gpiob_in  : in  std_ulogic_vector(NGPIOB - 1 downto 0) := (others => '0');
 
 	-- DRAM controller signals
 	alt_reset    : in std_ulogic := '0'
@@ -201,6 +210,10 @@ architecture behaviour of soc is
     signal wb_gpio_out   : wb_io_slave_out;
     signal gpio_intr     : std_ulogic := '0';
 
+    signal wb_gpiob_in    : wb_io_master_out;
+    signal wb_gpiob_out   : wb_io_slave_out;
+    signal gpiob_intr     : std_ulogic := '0';
+
     -- Main memory signals:
     signal wb_bram_in     : wishbone_master_out;
     signal wb_bram_out    : wishbone_slave_out;
@@ -241,6 +254,7 @@ architecture behaviour of soc is
                            SLAVE_IO_UART1,
                            SLAVE_IO_SPI_FLASH,
                            SLAVE_IO_GPIO,
+                           SLAVE_IO_GPIOB,
                            SLAVE_IO_EXTERNAL);
     signal current_io_decode : slave_io_type;
 
@@ -252,6 +266,7 @@ architecture behaviour of soc is
     signal io_cycle_ics       : std_ulogic;
     signal io_cycle_spi_flash : std_ulogic;
     signal io_cycle_gpio      : std_ulogic;
+    signal io_cycle_gpiob     : std_ulogic;
     signal io_cycle_external  : std_ulogic;
 
     function wishbone_widen_data(wb : wb_io_master_out) return wishbone_master_out is
@@ -612,6 +627,7 @@ begin
                 io_cycle_ics       <= '0';
                 io_cycle_spi_flash <= '0';
                 io_cycle_gpio      <= '0';
+                io_cycle_gpiob     <= '0';
                 io_cycle_external  <= '0';
                 wb_sio_out.cyc     <= '0';
                 wb_ext_is_dram_init <= '0';
@@ -674,6 +690,9 @@ begin
                 elsif std_match(match, x"C0007") then
                     slave_io := SLAVE_IO_GPIO;
                     io_cycle_gpio <= '1';
+                elsif std_match(match, x"C0008") then
+                    slave_io := SLAVE_IO_GPIOB;
+                    io_cycle_gpiob <= '1';
                 else
                     io_cycle_none <= '1';
                 end if;
@@ -700,6 +719,9 @@ begin
 
         wb_gpio_in <= wb_sio_out;
         wb_gpio_in.cyc <= io_cycle_gpio;
+
+        wb_gpiob_in <= wb_sio_out;
+        wb_gpiob_in.cyc <= io_cycle_gpiob;
 
 	 -- Only give xics 8 bits of wb addr (for now...)
 	wb_xics_icp_in <= wb_sio_out;
@@ -734,6 +756,8 @@ begin
 	    wb_sio_in <= wb_spiflash_out;
         when SLAVE_IO_GPIO =>
             wb_sio_in <= wb_gpio_out;
+        when SLAVE_IO_GPIOB =>
+            wb_sio_in <= wb_gpiob_out;
 	end case;
 
         -- Default response, ack & return all 1's
@@ -951,6 +975,23 @@ begin
                 );
     end generate;
 
+    gpiob_gen: if HAS_GPIOB generate
+        gpiob : entity work.gpio
+            generic map(
+                NGPIO => NGPIOB
+                )
+            port map(
+                clk      => system_clk,
+                rst      => rst_gpio,
+                wb_in    => wb_gpiob_in,
+                wb_out   => wb_gpiob_out,
+                gpio_in  => gpiob_in,
+                gpio_out => gpiob_out,
+                gpio_dir => gpiob_dir,
+                intr     => gpiob_intr
+                );
+    end generate;
+
     -- Assign external interrupts
     interrupts: process(all)
     begin
@@ -960,6 +1001,7 @@ begin
         int_level_in(2) <= uart1_irq;
         int_level_in(3) <= ext_irq_sdcard;
         int_level_in(4) <= gpio_intr;
+        int_level_in(5) <= gpiob_intr;
     end process;
 
     -- BRAM Memory slave

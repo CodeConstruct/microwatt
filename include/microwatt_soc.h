@@ -15,6 +15,7 @@
 #define XICS_ICS_BASE   0xc0005000  /* Interrupt controller */
 #define SPI_FCTRL_BASE  0xc0006000  /* SPI flash controller registers */
 #define GPIO_BASE       0xc0007000  /* GPIO registers */
+#define GPIOB_BASE      0xc0008000  /* GPIO registers */
 #define DRAM_CTRL_BASE	0xc8000000  /* LiteDRAM control registers */
 #define LETH_CSR_BASE	0xc8020000  /* LiteEth CSR registers */
 #define LETH_SRAM_BASE	0xc8030000  /* LiteEth MMIO space */
@@ -30,6 +31,7 @@
 #define IRQ_UART1       2
 #define IRQ_SDCARD      3
 #define IRQ_GPIO        4
+#define IRQ_GPIOB       5
 
 /*
  * Register definitions for the syscon registers

@@ -29,7 +29,8 @@ entity toplevel is
         HAS_UART1          : boolean  := true;
         USE_LITESDCARD     : boolean := true;
         HAS_GPIO           : boolean := true;
-        NGPIO              : natural := 32
+        NGPIO              : natural := 32;
+        NGPIOB             : natural := 32
         );
     port(
         ext_clk   : in  std_ulogic;
@@ -158,6 +159,10 @@ architecture behaviour of toplevel is
     signal gpio_out    : std_ulogic_vector(NGPIO - 1 downto 0);
     signal gpio_dir    : std_ulogic_vector(NGPIO - 1 downto 0);
 
+    signal gpiob_in    : std_ulogic_vector(NGPIOB - 1 downto 0);
+    signal gpiob_out   : std_ulogic_vector(NGPIOB - 1 downto 0);
+    signal gpiob_dir   : std_ulogic_vector(NGPIOB - 1 downto 0);
+
     -- ddram clock signals as vectors
     signal ddram_clk_p_vec : std_logic_vector(0 downto 0);
     signal ddram_clk_n_vec : std_logic_vector(0 downto 0);
@@ -209,7 +214,9 @@ begin
             HAS_UART1          => HAS_UART1,
             HAS_SD_CARD        => USE_LITESDCARD,
             HAS_GPIO           => HAS_GPIO,
-            NGPIO              => NGPIO
+            NGPIO              => NGPIO,
+            HAS_GPIOB          => true,
+            NGPIOB             => NGPIOB
             )
         port map (
             -- System signals
@@ -235,6 +242,10 @@ begin
             gpio_in           => gpio_in,
             gpio_out          => gpio_out,
             gpio_dir          => gpio_dir,
+
+            gpiob_in           => gpiob_in,
+            gpiob_out          => gpiob_out,
+            gpiob_dir          => gpiob_dir,
 
             -- External interrupts
             ext_irq_eth       => ext_irq_eth,
