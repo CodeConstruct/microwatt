@@ -28,8 +28,11 @@ set_property -dict { PACKAGE_PIN V17 IOSTANDARD LVCMOS33 } [get_ports { hpm_stby
 ################################################################################
 # Platform specific GPIOs
 ################################################################################
+# spec is I3C[3]_SCL_3V3
 set_property -dict { PACKAGE_PIN D19 IOSTANDARD LVCMOS33 } [get_ports { fsi_clk }];
+# spec is I3C[3]_SDA_3V3
 set_property -dict { PACKAGE_PIN F18 IOSTANDARD LVCMOS33 } [get_ports { fsi_dat }];
+# spec is HPM_STBY_RST_N_R
 set_property -dict { PACKAGE_PIN U1 IOSTANDARD LVCMOS33 } [get_ports { bmc_fsi_in_ena }];
 
 ################################################################################
@@ -89,6 +92,23 @@ set_property -dict { PACKAGE_PIN W7  IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[1
 set_property -dict { PACKAGE_PIN W9  IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[11]}];
 set_property -dict { PACKAGE_PIN V8  IOSTANDARD LVCMOS33 } [get_ports {i2c_scl[12]}];
 set_property -dict { PACKAGE_PIN V9  IOSTANDARD LVCMOS33 } [get_ports {i2c_sda[12]}];
+
+################################################################################
+# LPC
+################################################################################
+# spec ESPI_CLK
+set_property -dict { PACKAGE_PIN L18 IOSTANDARD LVCMOS33 } [get_ports { lpc_bmc_clk33 }];
+# spec ESPI_CS0_N
+set_property -dict { PACKAGE_PIN K18 IOSTANDARD LVCMOS33 PULLUP TRUE } [get_ports { lpc_frame_n }];
+# unused in lpcperipheral gateware, ESPI_ALERT_N
+# set_property -dict { PACKAGE_PIN H18 IOSTANDARD LVCMOS33 } [get_ports { bmc_serirq }];
+# spec ESPI_RESET_N
+set_property -dict { PACKAGE_PIN M17 IOSTANDARD LVCMOS33 PULLUP TRUE } [get_ports { lpc_bmc_rst_n }];
+# spec ESPI_IO0..3
+set_property -dict { PACKAGE_PIN K17 IOSTANDARD LVCMOS33 PULLUP TRUE } [get_ports {lpc_lad[0]}];
+set_property -dict { PACKAGE_PIN M16 IOSTANDARD LVCMOS33 PULLUP TRUE } [get_ports {lpc_lad[1]}];
+set_property -dict { PACKAGE_PIN K16 IOSTANDARD LVCMOS33 PULLUP TRUE } [get_ports {lpc_lad[2]}];
+set_property -dict { PACKAGE_PIN L16 IOSTANDARD LVCMOS33 PULLUP TRUE } [get_ports {lpc_lad[3]}];
 
 ################################################################################
 # SPI Flash

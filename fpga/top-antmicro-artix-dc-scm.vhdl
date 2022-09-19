@@ -73,6 +73,12 @@ entity toplevel is
         -- incorrect wiring, actually goes to i2c5_sda, edge A12
         -- pcie_bmc_clk_100_p : inout std_ulogic;
 
+        -- LPC
+        lpc_bmc_clk33 : in std_ulogic;
+        lpc_frame_n : in std_ulogic;
+        lpc_bmc_rst_n : in std_ulogic;
+        lpc_lad : inout std_ulogic_vector(3 downto 0);
+
         -- SPI
         spi_flash_cs_n   : out std_ulogic;
         spi_flash_mosi   : inout std_ulogic;
@@ -769,5 +775,11 @@ begin
 
     i2c_scl <= (others => 'Z');
     i2c_sda <= (others => 'Z');
+
+    scope_data <= lpc_lad;
+    -- XXX hook up properly once add gateware
+    scope_data_oe <= '0';
+    scope_frame_n <= lpc_frame_n;
+    scope_clk <= lpc_bmc_clk33;
 
 end architecture behaviour;
