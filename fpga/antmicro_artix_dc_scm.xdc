@@ -499,6 +499,7 @@ set_property CONFIG_MODE SPIx4 [current_design]
 
 #set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets main_ethphy_eth_rx_clk_ibuf]
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {has_liteeth.liteeth/main_maccore_ethphy_eth_rx_clk_ibuf}]
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets lpc_bmc_clk33_IBUF]
 
 ################################################################################
 # Clock constraints
@@ -509,6 +510,9 @@ create_clock -name sys_clk_pin -period 10.00 [get_ports { ext_clk }];
 create_clock -name eth_clocks_rx -period 8.0 [get_ports { eth_clocks_rx }]
 
 create_clock -name eth_clocks_tx -period 8.0 [get_ports { eth_clocks_tx }]
+
+# XXX matt
+# create_clock -name lpc_bmc_clk33 -period 8.0 [get_ports { lpc_bmc_clk33 }]
 
 
 set_clock_groups -asynchronous -group [get_clocks sys_clk_pin -include_generated_clocks] -group [get_clocks eth_clocks_rx -include_generated_clocks]
