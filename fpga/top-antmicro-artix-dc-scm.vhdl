@@ -734,9 +734,6 @@ begin
     tpm_pp <= gpio_out(23) when gpio_dir(23) = '1' else 'Z';
     gpio_in(23) <= tpm_pp;
 
-    gpio_in(30) <= '0';
-    gpio_in(31) <= '1';
-
     -- FSI
     fsi_clk <= gpio_out(24) when gpio_dir(24) = '1' else 'Z';
     gpio_in(24) <= fsi_clk;
@@ -744,6 +741,12 @@ begin
     gpio_in(25) <= fsi_dat;
     bmc_fsi_in_ena <= gpio_out(26) when gpio_dir(26) = '1' else 'Z';
     gpio_in(26) <= bmc_fsi_in_ena;
+
+    -- Fixed value spare gpios
+    gpio_in(28) <= '0';
+    gpio_in(29) <= '0';
+    gpio_in(30) <= '1';
+    gpio_in(31) <= '1';
 
     ---- I2C lines
     --i2c_gpios: for i in 0 to 12 generate
