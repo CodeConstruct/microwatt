@@ -221,11 +221,6 @@ architecture behaviour of soc is
     signal lpc_ipmi_irq  : std_ulogic;
 
     -- LPC master wb
-    signal lpc_master_wb_cyc : std_ulogic;
-    signal lpc_master_wb_stb : std_ulogic;
-    signal lpc_master_wb_err : std_ulogic;
-    signal lpc_master_wb_addr : std_ulogic_vector(29 downto 0);
-
     signal wb_lpc_dma_out  : wb_io_master_out := wb_io_master_out_init;
     signal wb_lpc_dma_in   : wb_io_slave_out;
     signal wb_lpc_dma_nr   : wb_io_master_out;
@@ -1057,7 +1052,6 @@ begin
 		bmc_ipmi_irq => lpc_ipmi_irq,
 		bmc_vuart_irq => lpc_vuart_irq
                 );
-	lpc_master_wb_err <= '0';
 	lpc_irq_o <= '0';
 	lpc_irq_oe <= '0';
 	-- FIXME hook up irqs
