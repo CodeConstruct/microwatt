@@ -138,6 +138,9 @@ entity soc is
         gpiob_dir : out std_ulogic_vector(NGPIOB - 1 downto 0);
         gpiob_in  : in  std_ulogic_vector(NGPIOB - 1 downto 0) := (others => '0');
 
+        -- SOC reset trigger from syscon
+        sw_soc_reset : out std_ulogic;
+
 	-- DRAM controller signals
 	alt_reset    : in std_ulogic := '0'
 	);
@@ -792,7 +795,7 @@ begin
 	    wishbone_out => wb_syscon_out,
 	    dram_at_0 => dram_at_0,
 	    core_reset => do_core_reset,
-	    soc_reset => open -- XXX TODO
+	    soc_reset => sw_soc_reset
 	    );
 
     --
