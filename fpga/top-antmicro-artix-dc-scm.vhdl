@@ -121,11 +121,13 @@ entity toplevel is
 end entity toplevel;
 
 architecture behaviour of toplevel is
-    signal ext_rst_n : std_ulogic;
 
     -- Reset signals:
     signal soc_rst : std_ulogic;
     signal pll_rst : std_ulogic;
+    signal ext_rst_n : std_ulogic;
+    signal sw_rst  : std_ulogic;
+    signal do_rst_n: std_ulogic;
 
     -- Internal clock signals:
     signal system_clk        : std_ulogic;
@@ -246,6 +248,7 @@ begin
             -- System signals
             system_clk        => system_clk,
             rst               => soc_rst,
+            sw_soc_reset      => sw_rst,
 
             -- UART signals
             uart0_txd         => uart_main_tx,
@@ -335,7 +338,7 @@ begin
                 ext_clk => ext_clk,
                 pll_clk => system_clk,
                 pll_locked_in => system_clk_locked,
-                ext_rst_in => ext_rst_n,
+                ext_rst_in => do_rst_n,
                 pll_rst_out => pll_rst,
                 rst_out => soc_rst
                 );
@@ -392,7 +395,7 @@ begin
                 ext_clk => ext_clk,
                 pll_clk => system_clk,
                 pll_locked_in => '1',
-                ext_rst_in => ext_rst_n,
+                ext_rst_in => do_rst_n,
                 pll_rst_out => pll_rst,
                 rst_out => open
                 );
@@ -400,7 +403,7 @@ begin
         -- Generate SoC reset
         soc_rst_gen: process(system_clk)
         begin
-            if ext_rst_n = '0' then
+            if do_rst_n = '0' then
                 soc_rst <= '1';
             elsif rising_edge(system_clk) then
                 soc_rst <= dram_sys_rst or not system_clk_locked;
@@ -646,7 +649,7 @@ begin
                      wb_sdcard_out when wb_ext_is_sdcard = '1' else
                      wb_dram_ctrl_out;
 
-
+    do_rst_n <= ext_rst_n and not sw_rst;
     ext_rst_n <= '1';
 
     usr_led(0) <= gpio_out(0) when gpio_dir(0) = '1' else 'Z';
