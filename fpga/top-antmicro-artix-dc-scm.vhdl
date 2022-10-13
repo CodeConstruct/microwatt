@@ -38,6 +38,10 @@ entity toplevel is
         uart_main_tx : out std_ulogic;
         uart_main_rx : in  std_ulogic;
 
+        -- for litescope debug uart
+        tpm_pirq : out std_ulogic;
+        tpm_pp  : in std_ulogic;
+
         -- LEDs
         d11_led : out std_ulogic;
         d12_led : out std_ulogic;

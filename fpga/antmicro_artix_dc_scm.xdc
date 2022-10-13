@@ -11,6 +11,12 @@ set_property -dict { PACKAGE_PIN T20 IOSTANDARD LVCMOS33 } [get_ports { d11_led 
 set_property -dict { PACKAGE_PIN U20 IOSTANDARD LVCMOS33 } [get_ports { d12_led }];
 set_property -dict { PACKAGE_PIN W20 IOSTANDARD LVCMOS33 } [get_ports { d13_led }];
 
+# J4 header (same shape as pmod)
+set_property -dict { PACKAGE_PIN G17 IOSTANDARD LVCMOS33 } [get_ports { tpm_pirq }]; #  7
+set_property -dict { PACKAGE_PIN V22 IOSTANDARD LVCMOS33 } [get_ports { tpm_rst }];  #  8
+set_property -dict { PACKAGE_PIN Y21 IOSTANDARD LVCMOS33 } [get_ports { tpm_gpio }]; #  9
+set_property -dict { PACKAGE_PIN G18 IOSTANDARD LVCMOS33 } [get_ports { tpm_pp }];   #  10
+
 ################################################################################
 # SPI Flash
 ################################################################################
