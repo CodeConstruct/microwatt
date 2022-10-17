@@ -9,7 +9,7 @@
 // Filename   : litesdcard_core.v
 // Device     : 
 // LiteX sha1 : --------
-// Date       : 2022-10-13 17:39:43
+// Date       : 2022-10-20 15:58:55
 //------------------------------------------------------------------------------
 
 
@@ -42,9 +42,9 @@ module litesdcard_core (
 	output wire [2:0] wb_dma_cti,
 	output wire [1:0] wb_dma_bte,
 	input  wire wb_dma_err,
-	inout  wire [3:0] sdcard_data,
+	inout  wire [7:0] sdcard_data,
 	inout  wire sdcard_cmd,
-	output wire sdcard_clk,
+	output reg  sdcard_clk,
 	input  wire sdcard_cd,
 	output wire irq
 );
@@ -163,7 +163,7 @@ reg  cmdr_source_ready = 1'd0;
 reg  cmdr_source_last = 1'd0;
 reg  [7:0] cmdr_source_payload_data = 8'd0;
 reg  [2:0] cmdr_source_payload_status = 3'd0;
-reg  [31:0] cmdr_timeout = 32'd48000000;
+reg  [31:0] cmdr_timeout = 32'd100000000;
 reg  [7:0] cmdr_count = 8'd0;
 reg  cmdr_busy = 1'd0;
 wire cmdr_cmdr_pads_in_valid;
@@ -401,7 +401,7 @@ reg  [7:0] datar_source_payload_data = 8'd0;
 reg  [2:0] datar_source_payload_status = 3'd0;
 reg  datar_stop = 1'd0;
 wire [1:0] datar_bus_width;
-reg  [31:0] datar_timeout = 32'd48000000;
+reg  [31:0] datar_timeout = 32'd100000000;
 reg  [9:0] datar_count = 10'd0;
 wire datar_datar_pads_in_valid;
 reg  datar_datar_pads_in_ready = 1'd0;
@@ -491,10 +491,10 @@ reg  datar_datar_reset = 1'd0;
 reg  [1:0] bus_width_storage = 2'd2;
 reg  bus_width_re = 1'd0;
 wire sdpads_clk;
-wire sdpads_cmd_i;
+reg  sdpads_cmd_i = 1'd0;
 wire sdpads_cmd_o;
 wire sdpads_cmd_oe;
-wire [7:0] sdpads_data_i;
+reg  [7:0] sdpads_data_i = 8'd0;
 wire [7:0] sdpads_data_o;
 wire sdpads_data_oe;
 reg  sdpads_data_i_ce = 1'd0;
@@ -1215,26 +1215,61 @@ reg  array_muxed4 = 1'd0;
 reg  array_muxed5 = 1'd0;
 reg  [2:0] array_muxed6 = 3'd0;
 reg  [1:0] array_muxed7 = 2'd0;
-wire inferedsdrtristate0__o;
-reg  inferedsdrtristate0_oe = 1'd0;
-wire inferedsdrtristate0__i;
 wire sdrio_clk;
-wire inferedsdrtristate1__o;
-reg  inferedsdrtristate1_oe = 1'd0;
-wire inferedsdrtristate1__i;
+reg  xilinxsdrtristateimpl0__o = 1'd0;
+reg  xilinxsdrtristateimpl0_oe_n = 1'd0;
+wire xilinxsdrtristateimpl0__i;
+reg  xilinxsdrtristateimpl1__o = 1'd0;
+reg  xilinxsdrtristateimpl1_oe_n = 1'd0;
+wire xilinxsdrtristateimpl1__i;
+reg  xilinxsdrtristateimpl2__o = 1'd0;
+reg  xilinxsdrtristateimpl2_oe_n = 1'd0;
+wire xilinxsdrtristateimpl2__i;
+reg  xilinxsdrtristateimpl3__o = 1'd0;
+reg  xilinxsdrtristateimpl3_oe_n = 1'd0;
+wire xilinxsdrtristateimpl3__i;
+reg  xilinxsdrtristateimpl4__o = 1'd0;
+reg  xilinxsdrtristateimpl4_oe_n = 1'd0;
+wire xilinxsdrtristateimpl4__i;
+reg  xilinxsdrtristateimpl5__o = 1'd0;
+reg  xilinxsdrtristateimpl5_oe_n = 1'd0;
+wire xilinxsdrtristateimpl5__i;
+reg  xilinxsdrtristateimpl6__o = 1'd0;
+reg  xilinxsdrtristateimpl6_oe_n = 1'd0;
+wire xilinxsdrtristateimpl6__i;
+reg  xilinxsdrtristateimpl7__o = 1'd0;
+reg  xilinxsdrtristateimpl7_oe_n = 1'd0;
+wire xilinxsdrtristateimpl7__i;
+reg  xilinxsdrtristateimpl8__o = 1'd0;
+reg  xilinxsdrtristateimpl8_oe_n = 1'd0;
+wire xilinxsdrtristateimpl8__i;
 wire sdrio_clk_1;
-wire inferedsdrtristate2__o;
-reg  inferedsdrtristate2_oe = 1'd0;
-wire inferedsdrtristate2__i;
 wire sdrio_clk_2;
-wire inferedsdrtristate3__o;
-reg  inferedsdrtristate3_oe = 1'd0;
-wire inferedsdrtristate3__i;
 wire sdrio_clk_3;
-wire inferedsdrtristate4__o;
-reg  inferedsdrtristate4_oe = 1'd0;
-wire inferedsdrtristate4__i;
 wire sdrio_clk_4;
+wire sdrio_clk_5;
+wire sdrio_clk_6;
+wire sdrio_clk_7;
+wire sdrio_clk_8;
+wire sdrio_clk_9;
+wire sdrio_clk_10;
+wire sdrio_clk_11;
+wire sdrio_clk_12;
+wire sdrio_clk_13;
+wire sdrio_clk_14;
+wire sdrio_clk_15;
+wire sdrio_clk_16;
+wire sdrio_clk_17;
+wire sdrio_clk_18;
+wire sdrio_clk_19;
+wire sdrio_clk_20;
+wire sdrio_clk_21;
+wire sdrio_clk_22;
+wire sdrio_clk_23;
+wire sdrio_clk_24;
+wire sdrio_clk_25;
+wire sdrio_clk_26;
+wire sdrio_clk_27;
 
 //------------------------------------------------------------------------------
 // Combinatorial Logic
@@ -1353,8 +1388,8 @@ assign clocker_clk0 = ((~clocker_clk1) & clocker_ce_latched);
 always @(*) begin
 	litesdcardcore_sdphyinit_next_state <= 1'd0;
 	init_count_sdphyinit_next_value <= 8'd0;
-	init_pads_out_payload_clk <= 1'd0;
 	init_count_sdphyinit_next_value_ce <= 1'd0;
+	init_pads_out_payload_clk <= 1'd0;
 	init_pads_out_payload_cmd_o <= 1'd0;
 	init_pads_out_payload_cmd_oe <= 1'd0;
 	init_pads_out_payload_data_o <= 8'd0;
@@ -1385,13 +1420,13 @@ always @(*) begin
 	endcase
 end
 always @(*) begin
-	litesdcardcore_sdphycmdw_next_state <= 2'd0;
-	cmdw_count_sdphycmdw_next_value <= 8'd0;
-	cmdw_count_sdphycmdw_next_value_ce <= 1'd0;
 	cmdw_done <= 1'd0;
 	cmdw_pads_out_payload_clk <= 1'd0;
 	cmdw_pads_out_payload_cmd_o <= 1'd0;
 	cmdw_pads_out_payload_cmd_oe <= 1'd0;
+	litesdcardcore_sdphycmdw_next_state <= 2'd0;
+	cmdw_count_sdphycmdw_next_value <= 8'd0;
+	cmdw_count_sdphycmdw_next_value_ce <= 1'd0;
 	cmdw_sink_ready <= 1'd0;
 	litesdcardcore_sdphycmdw_next_state <= litesdcardcore_sdphycmdw_state;
 	case (litesdcardcore_sdphycmdw_state)
@@ -1560,24 +1595,24 @@ assign cmdr_cmdr_conv8_converter_source_payload_data = cmdr_cmdr_conv8_converter
 assign cmdr_cmdr_conv8_converter_source_payload_valid_token_count = 1'd1;
 assign cmdr_cmdr_buf_sink_ready = ((~cmdr_cmdr_buf_source_valid) | cmdr_cmdr_buf_source_ready);
 always @(*) begin
+	cmdr_count_sdphycmdr_next_value1 <= 8'd0;
+	cmdr_count_sdphycmdr_next_value_ce1 <= 1'd0;
+	cmdr_busy_sdphycmdr_next_value2 <= 1'd0;
+	cmdr_busy_sdphycmdr_next_value_ce2 <= 1'd0;
+	cmdr_cmdr_reset_sdphycmdr_next_value3 <= 1'd0;
+	cmdr_cmdr_reset_sdphycmdr_next_value_ce3 <= 1'd0;
 	cmdr_pads_out_payload_clk <= 1'd0;
 	cmdr_pads_out_payload_cmd_o <= 1'd0;
 	cmdr_pads_out_payload_cmd_oe <= 1'd0;
 	cmdr_cmdr_source_source_ready <= 1'd0;
 	cmdr_sink_ready <= 1'd0;
 	litesdcardcore_sdphycmdr_next_state <= 3'd0;
-	cmdr_timeout_sdphycmdr_next_value0 <= 32'd0;
-	cmdr_timeout_sdphycmdr_next_value_ce0 <= 1'd0;
-	cmdr_count_sdphycmdr_next_value1 <= 8'd0;
-	cmdr_count_sdphycmdr_next_value_ce1 <= 1'd0;
 	cmdr_source_valid <= 1'd0;
-	cmdr_busy_sdphycmdr_next_value2 <= 1'd0;
-	cmdr_busy_sdphycmdr_next_value_ce2 <= 1'd0;
 	cmdr_source_last <= 1'd0;
 	cmdr_source_payload_data <= 8'd0;
 	cmdr_source_payload_status <= 3'd0;
-	cmdr_cmdr_reset_sdphycmdr_next_value3 <= 1'd0;
-	cmdr_cmdr_reset_sdphycmdr_next_value_ce3 <= 1'd0;
+	cmdr_timeout_sdphycmdr_next_value0 <= 32'd0;
+	cmdr_timeout_sdphycmdr_next_value_ce0 <= 1'd0;
 	litesdcardcore_sdphycmdr_next_state <= litesdcardcore_sdphycmdr_state;
 	case (litesdcardcore_sdphycmdr_state)
 		1'd1: begin
@@ -1607,7 +1642,7 @@ always @(*) begin
 					cmdr_sink_ready <= 1'd1;
 					if ((cmdr_sink_payload_cmd_type == 2'd3)) begin
 						cmdr_source_valid <= 1'd0;
-						cmdr_timeout_sdphycmdr_next_value0 <= 26'd48000000;
+						cmdr_timeout_sdphycmdr_next_value0 <= 27'd100000000;
 						cmdr_timeout_sdphycmdr_next_value_ce0 <= 1'd1;
 						litesdcardcore_sdphycmdr_next_state <= 2'd3;
 					end else begin
@@ -1671,7 +1706,7 @@ always @(*) begin
 			end
 		end
 		default: begin
-			cmdr_timeout_sdphycmdr_next_value0 <= 26'd48000000;
+			cmdr_timeout_sdphycmdr_next_value0 <= 27'd100000000;
 			cmdr_timeout_sdphycmdr_next_value_ce0 <= 1'd1;
 			cmdr_count_sdphycmdr_next_value1 <= 1'd0;
 			cmdr_count_sdphycmdr_next_value_ce1 <= 1'd1;
@@ -1787,23 +1822,23 @@ assign dataw_crc_conv8_converter_source_payload_data = dataw_crc_conv8_converter
 assign dataw_crc_conv8_converter_source_payload_valid_token_count = 1'd1;
 assign dataw_crc_buf_sink_ready = ((~dataw_crc_buf_source_valid) | dataw_crc_buf_source_ready);
 always @(*) begin
-	dataw_write_error1_sdphydataw_next_value_ce2 <= 1'd0;
 	dataw_crc_reset <= 1'd0;
-	dataw_count_sdphydataw_next_value3 <= 8'd0;
-	dataw_count_sdphydataw_next_value_ce3 <= 1'd0;
-	dataw_pads_out_payload_clk <= 1'd0;
-	dataw_pads_out_payload_cmd_o <= 1'd0;
-	dataw_pads_out_payload_cmd_oe <= 1'd0;
-	dataw_pads_out_payload_data_o <= 8'd0;
-	dataw_pads_out_payload_data_oe <= 1'd0;
-	dataw_sink_ready <= 1'd0;
-	dataw_stop <= 1'd0;
 	litesdcardcore_sdphydataw_next_state <= 4'd0;
 	dataw_accepted1_sdphydataw_next_value0 <= 1'd0;
 	dataw_accepted1_sdphydataw_next_value_ce0 <= 1'd0;
 	dataw_crc_error1_sdphydataw_next_value1 <= 1'd0;
 	dataw_crc_error1_sdphydataw_next_value_ce1 <= 1'd0;
+	dataw_pads_out_payload_clk <= 1'd0;
 	dataw_write_error1_sdphydataw_next_value2 <= 1'd0;
+	dataw_write_error1_sdphydataw_next_value_ce2 <= 1'd0;
+	dataw_pads_out_payload_cmd_o <= 1'd0;
+	dataw_pads_out_payload_cmd_oe <= 1'd0;
+	dataw_count_sdphydataw_next_value3 <= 8'd0;
+	dataw_pads_out_payload_data_o <= 8'd0;
+	dataw_count_sdphydataw_next_value_ce3 <= 1'd0;
+	dataw_pads_out_payload_data_oe <= 1'd0;
+	dataw_sink_ready <= 1'd0;
+	dataw_stop <= 1'd0;
 	litesdcardcore_sdphydataw_next_state <= litesdcardcore_sdphydataw_state;
 	case (litesdcardcore_sdphydataw_state)
 		1'd1: begin
@@ -2062,18 +2097,18 @@ assign datar_datar_conv8_converter_source_payload_valid_token_count = 1'd1;
 assign datar_datar_buf_sink_ready = ((~datar_datar_buf_source_valid) | datar_datar_buf_source_ready);
 always @(*) begin
 	datar_sink_ready <= 1'd0;
+	datar_source_valid <= 1'd0;
+	datar_source_first <= 1'd0;
+	datar_source_last <= 1'd0;
+	datar_source_payload_data <= 8'd0;
+	datar_source_payload_status <= 3'd0;
+	datar_stop <= 1'd0;
 	litesdcardcore_sdphydatar_next_state <= 3'd0;
 	datar_count_sdphydatar_next_value0 <= 10'd0;
 	datar_count_sdphydatar_next_value_ce0 <= 1'd0;
-	datar_source_valid <= 1'd0;
-	datar_source_first <= 1'd0;
 	datar_timeout_sdphydatar_next_value1 <= 32'd0;
-	datar_source_last <= 1'd0;
 	datar_timeout_sdphydatar_next_value_ce1 <= 1'd0;
-	datar_source_payload_data <= 8'd0;
-	datar_source_payload_status <= 3'd0;
 	datar_datar_reset_sdphydatar_next_value2 <= 1'd0;
-	datar_stop <= 1'd0;
 	datar_datar_reset_sdphydatar_next_value_ce2 <= 1'd0;
 	datar_pads_out_payload_clk <= 1'd0;
 	datar_datar_source_source_ready <= 1'd0;
@@ -2151,7 +2186,7 @@ always @(*) begin
 			datar_count_sdphydatar_next_value_ce0 <= 1'd1;
 			if ((datar_sink_valid & datar_pads_out_ready)) begin
 				datar_pads_out_payload_clk <= 1'd1;
-				datar_timeout_sdphydatar_next_value1 <= 32'd48000000;
+				datar_timeout_sdphydatar_next_value1 <= 32'd100000000;
 				datar_timeout_sdphydatar_next_value_ce1 <= 1'd1;
 				datar_count_sdphydatar_next_value0 <= 1'd0;
 				datar_count_sdphydatar_next_value_ce0 <= 1'd1;
@@ -2303,14 +2338,14 @@ always @(*) begin
 	end
 end
 always @(*) begin
-	sdcore_crc16_inserter_count_sdcore_crc16inserter_next_value <= 3'd0;
-	sdcore_crc16_inserter_count_sdcore_crc16inserter_next_value_ce <= 1'd0;
-	sdcore_crc16_inserter_sink_ready <= 1'd0;
 	sdcore_crc16_inserter_source_valid <= 1'd0;
 	sdcore_crc16_inserter_source_first <= 1'd0;
 	sdcore_crc16_inserter_source_last <= 1'd0;
 	sdcore_crc16_inserter_source_payload_data <= 8'd0;
 	litesdcardcore_sdcore_crc16inserter_next_state <= 1'd0;
+	sdcore_crc16_inserter_count_sdcore_crc16inserter_next_value <= 3'd0;
+	sdcore_crc16_inserter_count_sdcore_crc16inserter_next_value_ce <= 1'd0;
+	sdcore_crc16_inserter_sink_ready <= 1'd0;
 	litesdcardcore_sdcore_crc16inserter_next_state <= litesdcardcore_sdcore_crc16inserter_state;
 	case (litesdcardcore_sdcore_crc16inserter_state)
 		1'd1: begin
@@ -2461,11 +2496,18 @@ assign sdcore_fifo_syncfifo_dout = sdcore_fifo_rdport_dat_r;
 assign sdcore_fifo_syncfifo_writable = (sdcore_fifo_level != 4'd8);
 assign sdcore_fifo_syncfifo_readable = (sdcore_fifo_level != 1'd0);
 always @(*) begin
+	sdcore_cmd_error_sdcore_fsm_next_value4 <= 1'd0;
+	sdcore_sink_sink_first1 <= 1'd0;
+	sdcore_cmd_error_sdcore_fsm_next_value_ce4 <= 1'd0;
+	sdcore_sink_sink_last1 <= 1'd0;
+	sdcore_sink_sink_payload_data1 <= 8'd0;
+	sdcore_cmd_timeout_sdcore_fsm_next_value5 <= 1'd0;
+	sdcore_cmd_timeout_sdcore_fsm_next_value_ce5 <= 1'd0;
+	sdcore_data_error_sdcore_fsm_next_value6 <= 1'd0;
+	sdcore_data_error_sdcore_fsm_next_value_ce6 <= 1'd0;
 	sdcore_data_timeout_sdcore_fsm_next_value7 <= 1'd0;
 	sdcore_data_timeout_sdcore_fsm_next_value_ce7 <= 1'd0;
-	sdcore_cmd_response_status_sdcore_fsm_next_value8 <= 128'd0;
 	cmdr_sink_valid <= 1'd0;
-	sdcore_cmd_response_status_sdcore_fsm_next_value_ce8 <= 1'd0;
 	dataw_sink_valid <= 1'd0;
 	dataw_sink_first <= 1'd0;
 	dataw_sink_last <= 1'd0;
@@ -2474,6 +2516,8 @@ always @(*) begin
 	cmdr_sink_payload_data_type <= 2'd0;
 	cmdr_sink_payload_length <= 8'd0;
 	cmdr_source_ready <= 1'd0;
+	sdcore_cmd_response_status_sdcore_fsm_next_value8 <= 128'd0;
+	sdcore_cmd_response_status_sdcore_fsm_next_value_ce8 <= 1'd0;
 	cmdw_sink_valid <= 1'd0;
 	datar_sink_valid <= 1'd0;
 	cmdw_sink_last <= 1'd0;
@@ -2493,15 +2537,6 @@ always @(*) begin
 	sdcore_data_count_sdcore_fsm_next_value3 <= 32'd0;
 	sdcore_data_count_sdcore_fsm_next_value_ce3 <= 1'd0;
 	sdcore_sink_sink_valid1 <= 1'd0;
-	sdcore_cmd_error_sdcore_fsm_next_value4 <= 1'd0;
-	sdcore_sink_sink_first1 <= 1'd0;
-	sdcore_cmd_error_sdcore_fsm_next_value_ce4 <= 1'd0;
-	sdcore_sink_sink_last1 <= 1'd0;
-	sdcore_sink_sink_payload_data1 <= 8'd0;
-	sdcore_cmd_timeout_sdcore_fsm_next_value5 <= 1'd0;
-	sdcore_cmd_timeout_sdcore_fsm_next_value_ce5 <= 1'd0;
-	sdcore_data_error_sdcore_fsm_next_value6 <= 1'd0;
-	sdcore_data_error_sdcore_fsm_next_value_ce6 <= 1'd0;
 	litesdcardcore_sdcore_fsm_next_state <= litesdcardcore_sdcore_fsm_state;
 	case (litesdcardcore_sdcore_fsm_state)
 		1'd1: begin
@@ -2652,9 +2687,9 @@ end
 assign sdblock2mem_start = (sdblock2mem_sink_sink_valid0 & sdblock2mem_sink_sink_first);
 always @(*) begin
 	sdblock2mem_fifo_sink_valid <= 1'd0;
-	sdblock2mem_sink_sink_ready0 <= 1'd0;
-	sdblock2mem_fifo_sink_first <= 1'd0;
 	sdblock2mem_fifo_sink_last <= 1'd0;
+	sdblock2mem_fifo_sink_first <= 1'd0;
+	sdblock2mem_sink_sink_ready0 <= 1'd0;
 	sdblock2mem_fifo_sink_payload_data <= 8'd0;
 	if ((sdblock2mem_wishbonedmawriter_enable_storage & (sdblock2mem_start | sdblock2mem_connect))) begin
 		sdblock2mem_fifo_sink_valid <= sdblock2mem_sink_sink_valid0;
@@ -2726,15 +2761,15 @@ assign sdblock2mem_wishbonedmawriter_length = sdblock2mem_wishbonedmawriter_leng
 assign sdblock2mem_wishbonedmawriter_offset_status = sdblock2mem_wishbonedmawriter_offset;
 assign sdblock2mem_wishbonedmawriter_reset = (~sdblock2mem_wishbonedmawriter_enable_storage);
 always @(*) begin
-	sdblock2mem_sink_sink_last1 <= 1'd0;
-	litesdcardcore_sdblock2memdma_next_state <= 2'd0;
-	sdblock2mem_sink_sink_payload_address <= 32'd0;
-	sdblock2mem_wishbonedmawriter_offset_next_value <= 32'd0;
-	sdblock2mem_sink_sink_payload_data1 <= 32'd0;
-	sdblock2mem_wishbonedmawriter_offset_next_value_ce <= 1'd0;
-	sdblock2mem_wishbonedmawriter_done_status <= 1'd0;
 	sdblock2mem_wishbonedmawriter_sink_ready <= 1'd0;
 	sdblock2mem_sink_sink_valid1 <= 1'd0;
+	sdblock2mem_sink_sink_last1 <= 1'd0;
+	sdblock2mem_sink_sink_payload_address <= 32'd0;
+	litesdcardcore_sdblock2memdma_next_state <= 2'd0;
+	sdblock2mem_wishbonedmawriter_offset_next_value <= 32'd0;
+	sdblock2mem_wishbonedmawriter_offset_next_value_ce <= 1'd0;
+	sdblock2mem_wishbonedmawriter_done_status <= 1'd0;
+	sdblock2mem_sink_sink_payload_data1 <= 32'd0;
 	litesdcardcore_sdblock2memdma_next_state <= litesdcardcore_sdblock2memdma_state;
 	case (litesdcardcore_sdblock2memdma_state)
 		1'd1: begin
@@ -2793,18 +2828,18 @@ assign sdmem2block_dma_length = sdmem2block_dma_length_storage[31:2];
 assign sdmem2block_dma_offset_status = sdmem2block_dma_offset;
 assign sdmem2block_dma_reset = (~sdmem2block_dma_enable_storage);
 always @(*) begin
+	interface1_bus_we <= 1'd0;
+	sdmem2block_dma_source_last <= 1'd0;
+	sdmem2block_dma_source_payload_data <= 32'd0;
+	litesdcardcore_sdmem2blockdma_fsm_next_state <= 1'd0;
+	interface1_bus_adr <= 32'd0;
+	sdmem2block_dma_data_sdmem2blockdma_fsm_next_value <= 32'd0;
 	sdmem2block_dma_data_sdmem2blockdma_fsm_next_value_ce <= 1'd0;
 	sdmem2block_dma_sink_ready <= 1'd0;
 	interface1_bus_sel <= 4'd0;
 	interface1_bus_cyc <= 1'd0;
 	interface1_bus_stb <= 1'd0;
 	sdmem2block_dma_source_valid <= 1'd0;
-	interface1_bus_we <= 1'd0;
-	sdmem2block_dma_source_last <= 1'd0;
-	sdmem2block_dma_source_payload_data <= 32'd0;
-	sdmem2block_dma_data_sdmem2blockdma_fsm_next_value <= 32'd0;
-	litesdcardcore_sdmem2blockdma_fsm_next_state <= 1'd0;
-	interface1_bus_adr <= 32'd0;
 	litesdcardcore_sdmem2blockdma_fsm_next_state <= litesdcardcore_sdmem2blockdma_fsm_state;
 	case (litesdcardcore_sdmem2blockdma_fsm_state)
 		1'd1: begin
@@ -2831,13 +2866,13 @@ always @(*) begin
 	endcase
 end
 always @(*) begin
-	sdmem2block_dma_sink_valid <= 1'd0;
-	sdmem2block_dma_offset_sdmem2blockdma_resetinserter_next_value_ce <= 1'd0;
-	sdmem2block_dma_done_status <= 1'd0;
-	sdmem2block_dma_sink_last <= 1'd0;
-	sdmem2block_dma_sink_payload_address <= 32'd0;
 	litesdcardcore_sdmem2blockdma_resetinserter_next_state <= 2'd0;
 	sdmem2block_dma_offset_sdmem2blockdma_resetinserter_next_value <= 32'd0;
+	sdmem2block_dma_offset_sdmem2blockdma_resetinserter_next_value_ce <= 1'd0;
+	sdmem2block_dma_done_status <= 1'd0;
+	sdmem2block_dma_sink_valid <= 1'd0;
+	sdmem2block_dma_sink_last <= 1'd0;
+	sdmem2block_dma_sink_payload_address <= 32'd0;
 	litesdcardcore_sdmem2blockdma_resetinserter_next_state <= litesdcardcore_sdmem2blockdma_resetinserter_state;
 	case (litesdcardcore_sdmem2blockdma_resetinserter_state)
 		1'd1: begin
@@ -2965,12 +3000,12 @@ assign mem2block_dma_status = 1'd0;
 assign cmd_done_status = cmd_done_trigger;
 assign cmd_done_pending = cmd_done_trigger;
 always @(*) begin
-	litesdcardcore_dat_w <= 32'd0;
-	litesdcardcore_wishbone_ack <= 1'd0;
-	litesdcardcore_wishbone2csr_next_state <= 1'd0;
-	litesdcardcore_wishbone_dat_r <= 32'd0;
 	litesdcardcore_adr <= 14'd0;
 	litesdcardcore_we <= 1'd0;
+	litesdcardcore_wishbone_ack <= 1'd0;
+	litesdcardcore_dat_w <= 32'd0;
+	litesdcardcore_wishbone2csr_next_state <= 1'd0;
+	litesdcardcore_wishbone_dat_r <= 32'd0;
 	litesdcardcore_wishbone2csr_next_state <= litesdcardcore_wishbone2csr_state;
 	case (litesdcardcore_wishbone2csr_state)
 		1'd1: begin
@@ -3026,9 +3061,9 @@ assign wb_dma_cyc_1 = (shared_cyc & slave_sel);
 assign shared_err = wb_dma_err_1;
 assign wait_1 = ((shared_stb & shared_cyc) & (~shared_ack));
 always @(*) begin
-	shared_dat_r <= 32'd0;
 	shared_ack <= 1'd0;
 	error <= 1'd0;
+	shared_dat_r <= 32'd0;
 	shared_ack <= wb_dma_ack_1;
 	shared_dat_r <= ({32{slave_sel_r}} & wb_dma_dat_r_1);
 	if (done) begin
@@ -3041,8 +3076,8 @@ assign done = (count == 1'd0);
 assign csrbank0_sel = (interface0_bank_bus_adr[13:9] == 1'd0);
 assign csrbank0_reset0_r = interface0_bank_bus_dat_w[1:0];
 always @(*) begin
-	csrbank0_reset0_we <= 1'd0;
 	csrbank0_reset0_re <= 1'd0;
+	csrbank0_reset0_we <= 1'd0;
 	if ((csrbank0_sel & (interface0_bank_bus_adr[8:0] == 1'd0))) begin
 		csrbank0_reset0_re <= interface0_bank_bus_we;
 		csrbank0_reset0_we <= (~interface0_bank_bus_we);
@@ -3050,8 +3085,8 @@ always @(*) begin
 end
 assign csrbank0_scratch0_r = interface0_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank0_scratch0_re <= 1'd0;
 	csrbank0_scratch0_we <= 1'd0;
+	csrbank0_scratch0_re <= 1'd0;
 	if ((csrbank0_sel & (interface0_bank_bus_adr[8:0] == 1'd1))) begin
 		csrbank0_scratch0_re <= interface0_bank_bus_we;
 		csrbank0_scratch0_we <= (~interface0_bank_bus_we);
@@ -3059,8 +3094,8 @@ always @(*) begin
 end
 assign csrbank0_bus_errors_r = interface0_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank0_bus_errors_we <= 1'd0;
 	csrbank0_bus_errors_re <= 1'd0;
+	csrbank0_bus_errors_we <= 1'd0;
 	if ((csrbank0_sel & (interface0_bank_bus_adr[8:0] == 2'd2))) begin
 		csrbank0_bus_errors_re <= interface0_bank_bus_we;
 		csrbank0_bus_errors_we <= (~interface0_bank_bus_we);
@@ -3080,8 +3115,8 @@ assign bus_errors_we = csrbank0_bus_errors_we;
 assign csrbank1_sel = (interface1_bank_bus_adr[13:9] == 1'd1);
 assign csrbank1_dma_base1_r = interface1_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank1_dma_base1_re <= 1'd0;
 	csrbank1_dma_base1_we <= 1'd0;
+	csrbank1_dma_base1_re <= 1'd0;
 	if ((csrbank1_sel & (interface1_bank_bus_adr[8:0] == 1'd0))) begin
 		csrbank1_dma_base1_re <= interface1_bank_bus_we;
 		csrbank1_dma_base1_we <= (~interface1_bank_bus_we);
@@ -3089,8 +3124,8 @@ always @(*) begin
 end
 assign csrbank1_dma_base0_r = interface1_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank1_dma_base0_we <= 1'd0;
 	csrbank1_dma_base0_re <= 1'd0;
+	csrbank1_dma_base0_we <= 1'd0;
 	if ((csrbank1_sel & (interface1_bank_bus_adr[8:0] == 1'd1))) begin
 		csrbank1_dma_base0_re <= interface1_bank_bus_we;
 		csrbank1_dma_base0_we <= (~interface1_bank_bus_we);
@@ -3098,8 +3133,8 @@ always @(*) begin
 end
 assign csrbank1_dma_length0_r = interface1_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank1_dma_length0_re <= 1'd0;
 	csrbank1_dma_length0_we <= 1'd0;
+	csrbank1_dma_length0_re <= 1'd0;
 	if ((csrbank1_sel & (interface1_bank_bus_adr[8:0] == 2'd2))) begin
 		csrbank1_dma_length0_re <= interface1_bank_bus_we;
 		csrbank1_dma_length0_we <= (~interface1_bank_bus_we);
@@ -3107,8 +3142,8 @@ always @(*) begin
 end
 assign csrbank1_dma_enable0_r = interface1_bank_bus_dat_w[0];
 always @(*) begin
-	csrbank1_dma_enable0_we <= 1'd0;
 	csrbank1_dma_enable0_re <= 1'd0;
+	csrbank1_dma_enable0_we <= 1'd0;
 	if ((csrbank1_sel & (interface1_bank_bus_adr[8:0] == 2'd3))) begin
 		csrbank1_dma_enable0_re <= interface1_bank_bus_we;
 		csrbank1_dma_enable0_we <= (~interface1_bank_bus_we);
@@ -3116,8 +3151,8 @@ always @(*) begin
 end
 assign csrbank1_dma_done_r = interface1_bank_bus_dat_w[0];
 always @(*) begin
-	csrbank1_dma_done_we <= 1'd0;
 	csrbank1_dma_done_re <= 1'd0;
+	csrbank1_dma_done_we <= 1'd0;
 	if ((csrbank1_sel & (interface1_bank_bus_adr[8:0] == 3'd4))) begin
 		csrbank1_dma_done_re <= interface1_bank_bus_we;
 		csrbank1_dma_done_we <= (~interface1_bank_bus_we);
@@ -3125,8 +3160,8 @@ always @(*) begin
 end
 assign csrbank1_dma_loop0_r = interface1_bank_bus_dat_w[0];
 always @(*) begin
-	csrbank1_dma_loop0_re <= 1'd0;
 	csrbank1_dma_loop0_we <= 1'd0;
+	csrbank1_dma_loop0_re <= 1'd0;
 	if ((csrbank1_sel & (interface1_bank_bus_adr[8:0] == 3'd5))) begin
 		csrbank1_dma_loop0_re <= interface1_bank_bus_we;
 		csrbank1_dma_loop0_we <= (~interface1_bank_bus_we);
@@ -3134,8 +3169,8 @@ always @(*) begin
 end
 assign csrbank1_dma_offset_r = interface1_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank1_dma_offset_we <= 1'd0;
 	csrbank1_dma_offset_re <= 1'd0;
+	csrbank1_dma_offset_we <= 1'd0;
 	if ((csrbank1_sel & (interface1_bank_bus_adr[8:0] == 3'd6))) begin
 		csrbank1_dma_offset_re <= interface1_bank_bus_we;
 		csrbank1_dma_offset_we <= (~interface1_bank_bus_we);
@@ -3153,8 +3188,8 @@ assign sdblock2mem_wishbonedmawriter_offset_we = csrbank1_dma_offset_we;
 assign csrbank2_sel = (interface2_bank_bus_adr[13:9] == 2'd2);
 assign csrbank2_cmd_argument0_r = interface2_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank2_cmd_argument0_we <= 1'd0;
 	csrbank2_cmd_argument0_re <= 1'd0;
+	csrbank2_cmd_argument0_we <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 1'd0))) begin
 		csrbank2_cmd_argument0_re <= interface2_bank_bus_we;
 		csrbank2_cmd_argument0_we <= (~interface2_bank_bus_we);
@@ -3162,8 +3197,8 @@ always @(*) begin
 end
 assign csrbank2_cmd_command0_r = interface2_bank_bus_dat_w[13:0];
 always @(*) begin
-	csrbank2_cmd_command0_re <= 1'd0;
 	csrbank2_cmd_command0_we <= 1'd0;
+	csrbank2_cmd_command0_re <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 1'd1))) begin
 		csrbank2_cmd_command0_re <= interface2_bank_bus_we;
 		csrbank2_cmd_command0_we <= (~interface2_bank_bus_we);
@@ -3171,8 +3206,8 @@ always @(*) begin
 end
 assign csrbank2_cmd_send0_r = interface2_bank_bus_dat_w[0];
 always @(*) begin
-	csrbank2_cmd_send0_we <= 1'd0;
 	csrbank2_cmd_send0_re <= 1'd0;
+	csrbank2_cmd_send0_we <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 2'd2))) begin
 		csrbank2_cmd_send0_re <= interface2_bank_bus_we;
 		csrbank2_cmd_send0_we <= (~interface2_bank_bus_we);
@@ -3180,8 +3215,8 @@ always @(*) begin
 end
 assign csrbank2_cmd_response3_r = interface2_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank2_cmd_response3_we <= 1'd0;
 	csrbank2_cmd_response3_re <= 1'd0;
+	csrbank2_cmd_response3_we <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 2'd3))) begin
 		csrbank2_cmd_response3_re <= interface2_bank_bus_we;
 		csrbank2_cmd_response3_we <= (~interface2_bank_bus_we);
@@ -3189,8 +3224,8 @@ always @(*) begin
 end
 assign csrbank2_cmd_response2_r = interface2_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank2_cmd_response2_re <= 1'd0;
 	csrbank2_cmd_response2_we <= 1'd0;
+	csrbank2_cmd_response2_re <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 3'd4))) begin
 		csrbank2_cmd_response2_re <= interface2_bank_bus_we;
 		csrbank2_cmd_response2_we <= (~interface2_bank_bus_we);
@@ -3198,8 +3233,8 @@ always @(*) begin
 end
 assign csrbank2_cmd_response1_r = interface2_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank2_cmd_response1_re <= 1'd0;
 	csrbank2_cmd_response1_we <= 1'd0;
+	csrbank2_cmd_response1_re <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 3'd5))) begin
 		csrbank2_cmd_response1_re <= interface2_bank_bus_we;
 		csrbank2_cmd_response1_we <= (~interface2_bank_bus_we);
@@ -3207,8 +3242,8 @@ always @(*) begin
 end
 assign csrbank2_cmd_response0_r = interface2_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank2_cmd_response0_we <= 1'd0;
 	csrbank2_cmd_response0_re <= 1'd0;
+	csrbank2_cmd_response0_we <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 3'd6))) begin
 		csrbank2_cmd_response0_re <= interface2_bank_bus_we;
 		csrbank2_cmd_response0_we <= (~interface2_bank_bus_we);
@@ -3216,8 +3251,8 @@ always @(*) begin
 end
 assign csrbank2_cmd_event_r = interface2_bank_bus_dat_w[3:0];
 always @(*) begin
-	csrbank2_cmd_event_we <= 1'd0;
 	csrbank2_cmd_event_re <= 1'd0;
+	csrbank2_cmd_event_we <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 3'd7))) begin
 		csrbank2_cmd_event_re <= interface2_bank_bus_we;
 		csrbank2_cmd_event_we <= (~interface2_bank_bus_we);
@@ -3225,8 +3260,8 @@ always @(*) begin
 end
 assign csrbank2_data_event_r = interface2_bank_bus_dat_w[3:0];
 always @(*) begin
-	csrbank2_data_event_re <= 1'd0;
 	csrbank2_data_event_we <= 1'd0;
+	csrbank2_data_event_re <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 4'd8))) begin
 		csrbank2_data_event_re <= interface2_bank_bus_we;
 		csrbank2_data_event_we <= (~interface2_bank_bus_we);
@@ -3234,8 +3269,8 @@ always @(*) begin
 end
 assign csrbank2_block_length0_r = interface2_bank_bus_dat_w[9:0];
 always @(*) begin
-	csrbank2_block_length0_re <= 1'd0;
 	csrbank2_block_length0_we <= 1'd0;
+	csrbank2_block_length0_re <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 4'd9))) begin
 		csrbank2_block_length0_re <= interface2_bank_bus_we;
 		csrbank2_block_length0_we <= (~interface2_bank_bus_we);
@@ -3243,8 +3278,8 @@ always @(*) begin
 end
 assign csrbank2_block_count0_r = interface2_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank2_block_count0_we <= 1'd0;
 	csrbank2_block_count0_re <= 1'd0;
+	csrbank2_block_count0_we <= 1'd0;
 	if ((csrbank2_sel & (interface2_bank_bus_adr[8:0] == 4'd10))) begin
 		csrbank2_block_count0_re <= interface2_bank_bus_we;
 		csrbank2_block_count0_we <= (~interface2_bank_bus_we);
@@ -3284,8 +3319,8 @@ assign csrbank2_block_count0_w = sdcore_block_count_storage[31:0];
 assign csrbank3_sel = (interface3_bank_bus_adr[13:9] == 2'd3);
 assign csrbank3_status_r = interface3_bank_bus_dat_w[3:0];
 always @(*) begin
-	csrbank3_status_we <= 1'd0;
 	csrbank3_status_re <= 1'd0;
+	csrbank3_status_we <= 1'd0;
 	if ((csrbank3_sel & (interface3_bank_bus_adr[8:0] == 1'd0))) begin
 		csrbank3_status_re <= interface3_bank_bus_we;
 		csrbank3_status_we <= (~interface3_bank_bus_we);
@@ -3293,8 +3328,8 @@ always @(*) begin
 end
 assign csrbank3_pending_r = interface3_bank_bus_dat_w[3:0];
 always @(*) begin
-	csrbank3_pending_we <= 1'd0;
 	csrbank3_pending_re <= 1'd0;
+	csrbank3_pending_we <= 1'd0;
 	if ((csrbank3_sel & (interface3_bank_bus_adr[8:0] == 1'd1))) begin
 		csrbank3_pending_re <= interface3_bank_bus_we;
 		csrbank3_pending_we <= (~interface3_bank_bus_we);
@@ -3302,8 +3337,8 @@ always @(*) begin
 end
 assign csrbank3_enable0_r = interface3_bank_bus_dat_w[3:0];
 always @(*) begin
-	csrbank3_enable0_re <= 1'd0;
 	csrbank3_enable0_we <= 1'd0;
+	csrbank3_enable0_re <= 1'd0;
 	if ((csrbank3_sel & (interface3_bank_bus_adr[8:0] == 2'd2))) begin
 		csrbank3_enable0_re <= interface3_bank_bus_we;
 		csrbank3_enable0_we <= (~interface3_bank_bus_we);
@@ -3335,8 +3370,8 @@ assign csrbank3_enable0_w = eventmanager_enable_storage[3:0];
 assign csrbank4_sel = (interface4_bank_bus_adr[13:9] == 3'd4);
 assign csrbank4_dma_base1_r = interface4_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank4_dma_base1_re <= 1'd0;
 	csrbank4_dma_base1_we <= 1'd0;
+	csrbank4_dma_base1_re <= 1'd0;
 	if ((csrbank4_sel & (interface4_bank_bus_adr[8:0] == 1'd0))) begin
 		csrbank4_dma_base1_re <= interface4_bank_bus_we;
 		csrbank4_dma_base1_we <= (~interface4_bank_bus_we);
@@ -3344,8 +3379,8 @@ always @(*) begin
 end
 assign csrbank4_dma_base0_r = interface4_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank4_dma_base0_we <= 1'd0;
 	csrbank4_dma_base0_re <= 1'd0;
+	csrbank4_dma_base0_we <= 1'd0;
 	if ((csrbank4_sel & (interface4_bank_bus_adr[8:0] == 1'd1))) begin
 		csrbank4_dma_base0_re <= interface4_bank_bus_we;
 		csrbank4_dma_base0_we <= (~interface4_bank_bus_we);
@@ -3353,8 +3388,8 @@ always @(*) begin
 end
 assign csrbank4_dma_length0_r = interface4_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank4_dma_length0_we <= 1'd0;
 	csrbank4_dma_length0_re <= 1'd0;
+	csrbank4_dma_length0_we <= 1'd0;
 	if ((csrbank4_sel & (interface4_bank_bus_adr[8:0] == 2'd2))) begin
 		csrbank4_dma_length0_re <= interface4_bank_bus_we;
 		csrbank4_dma_length0_we <= (~interface4_bank_bus_we);
@@ -3362,8 +3397,8 @@ always @(*) begin
 end
 assign csrbank4_dma_enable0_r = interface4_bank_bus_dat_w[0];
 always @(*) begin
-	csrbank4_dma_enable0_re <= 1'd0;
 	csrbank4_dma_enable0_we <= 1'd0;
+	csrbank4_dma_enable0_re <= 1'd0;
 	if ((csrbank4_sel & (interface4_bank_bus_adr[8:0] == 2'd3))) begin
 		csrbank4_dma_enable0_re <= interface4_bank_bus_we;
 		csrbank4_dma_enable0_we <= (~interface4_bank_bus_we);
@@ -3371,8 +3406,8 @@ always @(*) begin
 end
 assign csrbank4_dma_done_r = interface4_bank_bus_dat_w[0];
 always @(*) begin
-	csrbank4_dma_done_we <= 1'd0;
 	csrbank4_dma_done_re <= 1'd0;
+	csrbank4_dma_done_we <= 1'd0;
 	if ((csrbank4_sel & (interface4_bank_bus_adr[8:0] == 3'd4))) begin
 		csrbank4_dma_done_re <= interface4_bank_bus_we;
 		csrbank4_dma_done_we <= (~interface4_bank_bus_we);
@@ -3380,8 +3415,8 @@ always @(*) begin
 end
 assign csrbank4_dma_loop0_r = interface4_bank_bus_dat_w[0];
 always @(*) begin
-	csrbank4_dma_loop0_we <= 1'd0;
 	csrbank4_dma_loop0_re <= 1'd0;
+	csrbank4_dma_loop0_we <= 1'd0;
 	if ((csrbank4_sel & (interface4_bank_bus_adr[8:0] == 3'd5))) begin
 		csrbank4_dma_loop0_re <= interface4_bank_bus_we;
 		csrbank4_dma_loop0_we <= (~interface4_bank_bus_we);
@@ -3389,8 +3424,8 @@ always @(*) begin
 end
 assign csrbank4_dma_offset_r = interface4_bank_bus_dat_w[31:0];
 always @(*) begin
-	csrbank4_dma_offset_re <= 1'd0;
 	csrbank4_dma_offset_we <= 1'd0;
+	csrbank4_dma_offset_re <= 1'd0;
 	if ((csrbank4_sel & (interface4_bank_bus_adr[8:0] == 3'd6))) begin
 		csrbank4_dma_offset_re <= interface4_bank_bus_we;
 		csrbank4_dma_offset_we <= (~interface4_bank_bus_we);
@@ -3408,8 +3443,8 @@ assign sdmem2block_dma_offset_we = csrbank4_dma_offset_we;
 assign csrbank5_sel = (interface5_bank_bus_adr[13:9] == 3'd5);
 assign csrbank5_card_detect_r = interface5_bank_bus_dat_w[0];
 always @(*) begin
-	csrbank5_card_detect_we <= 1'd0;
 	csrbank5_card_detect_re <= 1'd0;
+	csrbank5_card_detect_we <= 1'd0;
 	if ((csrbank5_sel & (interface5_bank_bus_adr[8:0] == 1'd0))) begin
 		csrbank5_card_detect_re <= interface5_bank_bus_we;
 		csrbank5_card_detect_we <= (~interface5_bank_bus_we);
@@ -3417,8 +3452,8 @@ always @(*) begin
 end
 assign csrbank5_clocker_divider0_r = interface5_bank_bus_dat_w[8:0];
 always @(*) begin
-	csrbank5_clocker_divider0_we <= 1'd0;
 	csrbank5_clocker_divider0_re <= 1'd0;
+	csrbank5_clocker_divider0_we <= 1'd0;
 	if ((csrbank5_sel & (interface5_bank_bus_adr[8:0] == 1'd1))) begin
 		csrbank5_clocker_divider0_re <= interface5_bank_bus_we;
 		csrbank5_clocker_divider0_we <= (~interface5_bank_bus_we);
@@ -3435,8 +3470,8 @@ always @(*) begin
 end
 assign csrbank5_dataw_status_r = interface5_bank_bus_dat_w[2:0];
 always @(*) begin
-	csrbank5_dataw_status_re <= 1'd0;
 	csrbank5_dataw_status_we <= 1'd0;
+	csrbank5_dataw_status_re <= 1'd0;
 	if ((csrbank5_sel & (interface5_bank_bus_adr[8:0] == 2'd3))) begin
 		csrbank5_dataw_status_re <= interface5_bank_bus_we;
 		csrbank5_dataw_status_we <= (~interface5_bank_bus_we);
@@ -3444,8 +3479,8 @@ always @(*) begin
 end
 assign csrbank5_bus_width0_r = interface5_bank_bus_dat_w[1:0];
 always @(*) begin
-	csrbank5_bus_width0_re <= 1'd0;
 	csrbank5_bus_width0_we <= 1'd0;
+	csrbank5_bus_width0_re <= 1'd0;
 	if ((csrbank5_sel & (interface5_bank_bus_adr[8:0] == 3'd4))) begin
 		csrbank5_bus_width0_re <= interface5_bank_bus_we;
 		csrbank5_bus_width0_we <= (~interface5_bank_bus_we);
@@ -3579,6 +3614,29 @@ assign sdrio_clk_1 = sys_clk;
 assign sdrio_clk_2 = sys_clk;
 assign sdrio_clk_3 = sys_clk;
 assign sdrio_clk_4 = sys_clk;
+assign sdrio_clk_5 = sys_clk;
+assign sdrio_clk_6 = sys_clk;
+assign sdrio_clk_7 = sys_clk;
+assign sdrio_clk_8 = sys_clk;
+assign sdrio_clk_9 = sys_clk;
+assign sdrio_clk_10 = sys_clk;
+assign sdrio_clk_11 = sys_clk;
+assign sdrio_clk_12 = sys_clk;
+assign sdrio_clk_13 = sys_clk;
+assign sdrio_clk_14 = sys_clk;
+assign sdrio_clk_15 = sys_clk;
+assign sdrio_clk_16 = sys_clk;
+assign sdrio_clk_17 = sys_clk;
+assign sdrio_clk_18 = sys_clk;
+assign sdrio_clk_19 = sys_clk;
+assign sdrio_clk_20 = sys_clk;
+assign sdrio_clk_21 = sys_clk;
+assign sdrio_clk_22 = sys_clk;
+assign sdrio_clk_23 = sys_clk;
+assign sdrio_clk_24 = sys_clk;
+assign sdrio_clk_25 = sys_clk;
+assign sdrio_clk_26 = sys_clk;
+assign sdrio_clk_27 = sys_clk;
 
 
 //------------------------------------------------------------------------------
@@ -3590,11 +3648,34 @@ always @(posedge por_clk) begin
 end
 
 always @(posedge sdrio_clk) begin
-	inferedsdrtristate0_oe <= sdpads_cmd_oe;
-	inferedsdrtristate1_oe <= sdpads_data_oe;
-	inferedsdrtristate2_oe <= sdpads_data_oe;
-	inferedsdrtristate3_oe <= sdpads_data_oe;
-	inferedsdrtristate4_oe <= sdpads_data_oe;
+	sdcard_clk <= (~clocker_clk0);
+	xilinxsdrtristateimpl0__o <= sdpads_cmd_o;
+	xilinxsdrtristateimpl0_oe_n <= (~sdpads_cmd_oe);
+	sdpads_cmd_i <= xilinxsdrtristateimpl0__i;
+	xilinxsdrtristateimpl1__o <= sdpads_data_o[0];
+	xilinxsdrtristateimpl1_oe_n <= (~sdpads_data_oe);
+	sdpads_data_i[0] <= xilinxsdrtristateimpl1__i;
+	xilinxsdrtristateimpl2__o <= sdpads_data_o[1];
+	xilinxsdrtristateimpl2_oe_n <= (~sdpads_data_oe);
+	sdpads_data_i[1] <= xilinxsdrtristateimpl2__i;
+	xilinxsdrtristateimpl3__o <= sdpads_data_o[2];
+	xilinxsdrtristateimpl3_oe_n <= (~sdpads_data_oe);
+	sdpads_data_i[2] <= xilinxsdrtristateimpl3__i;
+	xilinxsdrtristateimpl4__o <= sdpads_data_o[3];
+	xilinxsdrtristateimpl4_oe_n <= (~sdpads_data_oe);
+	sdpads_data_i[3] <= xilinxsdrtristateimpl4__i;
+	xilinxsdrtristateimpl5__o <= sdpads_data_o[4];
+	xilinxsdrtristateimpl5_oe_n <= (~sdpads_data_oe);
+	sdpads_data_i[4] <= xilinxsdrtristateimpl5__i;
+	xilinxsdrtristateimpl6__o <= sdpads_data_o[5];
+	xilinxsdrtristateimpl6_oe_n <= (~sdpads_data_oe);
+	sdpads_data_i[5] <= xilinxsdrtristateimpl6__i;
+	xilinxsdrtristateimpl7__o <= sdpads_data_o[6];
+	xilinxsdrtristateimpl7_oe_n <= (~sdpads_data_oe);
+	sdpads_data_i[6] <= xilinxsdrtristateimpl7__i;
+	xilinxsdrtristateimpl8__o <= sdpads_data_o[7];
+	xilinxsdrtristateimpl8_oe_n <= (~sdpads_data_oe);
+	sdpads_data_i[7] <= xilinxsdrtristateimpl8__i;
 end
 
 always @(posedge sys_clk) begin
@@ -4514,7 +4595,7 @@ always @(posedge sys_clk) begin
 		clocker_ce_delayed <= 1'd0;
 		init_count <= 8'd0;
 		cmdw_count <= 8'd0;
-		cmdr_timeout <= 32'd48000000;
+		cmdr_timeout <= 32'd100000000;
 		cmdr_count <= 8'd0;
 		cmdr_busy <= 1'd0;
 		cmdr_cmdr_run <= 1'd0;
@@ -4545,7 +4626,7 @@ always @(posedge sys_clk) begin
 		dataw_crc_conv4_converter_strobe_all <= 1'd0;
 		dataw_crc_buf_source_valid <= 1'd0;
 		dataw_crc_buf_source_payload_data <= 8'd0;
-		datar_timeout <= 32'd48000000;
+		datar_timeout <= 32'd100000000;
 		datar_count <= 10'd0;
 		datar_datar_run <= 1'd0;
 		datar_datar_conv1_converter_source_payload_data <= 8'd0;
@@ -4728,111 +4809,71 @@ assign sdmem2block_fifo_wrport_dat_r = storage_2_dat0;
 assign sdmem2block_fifo_rdport_dat_r = storage_2_dat1;
 
 
-OFS1P3BX OFS1P3BX(
-	.D((~clocker_clk0)),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(sdcard_clk)
+IOBUF IOBUF(
+	.I(xilinxsdrtristateimpl0__o),
+	.T(xilinxsdrtristateimpl0_oe_n),
+	.IO(sdcard_cmd),
+	.O(xilinxsdrtristateimpl0__i)
 );
 
-assign sdcard_cmd = inferedsdrtristate0_oe ? inferedsdrtristate0__o : 1'bz;
-assign inferedsdrtristate0__i = sdcard_cmd;
-
-assign sdcard_data[0] = inferedsdrtristate1_oe ? inferedsdrtristate1__o : 1'bz;
-assign inferedsdrtristate1__i = sdcard_data[0];
-
-assign sdcard_data[1] = inferedsdrtristate2_oe ? inferedsdrtristate2__o : 1'bz;
-assign inferedsdrtristate2__i = sdcard_data[1];
-
-assign sdcard_data[2] = inferedsdrtristate3_oe ? inferedsdrtristate3__o : 1'bz;
-assign inferedsdrtristate3__i = sdcard_data[2];
-
-assign sdcard_data[3] = inferedsdrtristate4_oe ? inferedsdrtristate4__o : 1'bz;
-assign inferedsdrtristate4__i = sdcard_data[3];
-
-OFS1P3BX OFS1P3BX_1(
-	.D(sdpads_cmd_o),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(inferedsdrtristate0__o)
+IOBUF IOBUF_1(
+	.I(xilinxsdrtristateimpl1__o),
+	.T(xilinxsdrtristateimpl1_oe_n),
+	.IO(sdcard_data[0]),
+	.O(xilinxsdrtristateimpl1__i)
 );
 
-IFS1P3BX IFS1P3BX(
-	.D(inferedsdrtristate0__i),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(sdpads_cmd_i)
+IOBUF IOBUF_2(
+	.I(xilinxsdrtristateimpl2__o),
+	.T(xilinxsdrtristateimpl2_oe_n),
+	.IO(sdcard_data[1]),
+	.O(xilinxsdrtristateimpl2__i)
 );
 
-OFS1P3BX OFS1P3BX_2(
-	.D(sdpads_data_o[0]),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(inferedsdrtristate1__o)
+IOBUF IOBUF_3(
+	.I(xilinxsdrtristateimpl3__o),
+	.T(xilinxsdrtristateimpl3_oe_n),
+	.IO(sdcard_data[2]),
+	.O(xilinxsdrtristateimpl3__i)
 );
 
-IFS1P3BX IFS1P3BX_1(
-	.D(inferedsdrtristate1__i),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(sdpads_data_i[0])
+IOBUF IOBUF_4(
+	.I(xilinxsdrtristateimpl4__o),
+	.T(xilinxsdrtristateimpl4_oe_n),
+	.IO(sdcard_data[3]),
+	.O(xilinxsdrtristateimpl4__i)
 );
 
-OFS1P3BX OFS1P3BX_3(
-	.D(sdpads_data_o[1]),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(inferedsdrtristate2__o)
+IOBUF IOBUF_5(
+	.I(xilinxsdrtristateimpl5__o),
+	.T(xilinxsdrtristateimpl5_oe_n),
+	.IO(sdcard_data[4]),
+	.O(xilinxsdrtristateimpl5__i)
 );
 
-IFS1P3BX IFS1P3BX_2(
-	.D(inferedsdrtristate2__i),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(sdpads_data_i[1])
+IOBUF IOBUF_6(
+	.I(xilinxsdrtristateimpl6__o),
+	.T(xilinxsdrtristateimpl6_oe_n),
+	.IO(sdcard_data[5]),
+	.O(xilinxsdrtristateimpl6__i)
 );
 
-OFS1P3BX OFS1P3BX_4(
-	.D(sdpads_data_o[2]),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(inferedsdrtristate3__o)
+IOBUF IOBUF_7(
+	.I(xilinxsdrtristateimpl7__o),
+	.T(xilinxsdrtristateimpl7_oe_n),
+	.IO(sdcard_data[6]),
+	.O(xilinxsdrtristateimpl7__i)
 );
 
-IFS1P3BX IFS1P3BX_3(
-	.D(inferedsdrtristate3__i),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(sdpads_data_i[2])
-);
-
-OFS1P3BX OFS1P3BX_5(
-	.D(sdpads_data_o[3]),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(inferedsdrtristate4__o)
-);
-
-IFS1P3BX IFS1P3BX_4(
-	.D(inferedsdrtristate4__i),
-	.PD(1'd0),
-	.SCLK(sys_clk),
-	.SP(1'd1),
-	.Q(sdpads_data_i[3])
+IOBUF IOBUF_8(
+	.I(xilinxsdrtristateimpl8__o),
+	.T(xilinxsdrtristateimpl8_oe_n),
+	.IO(sdcard_data[7]),
+	.O(xilinxsdrtristateimpl8__i)
 );
 
 endmodule
 
 // -----------------------------------------------------------------------------
-//  Auto-Generated by LiteX on 2022-10-13 17:39:43.
+//  Auto-Generated by LiteX on 2022-10-20 15:58:55.
 //------------------------------------------------------------------------------

@@ -98,7 +98,6 @@ entity toplevel is
         eth_tx_data      : out std_ulogic_vector(3 downto 0);
 
         -- SD card
-        -- note that only 4 bits are used by litesdcard
         sdcard_data   : inout std_ulogic_vector(7 downto 0);
         sdcard_cmd    : inout std_ulogic;
         sdcard_clk    : out   std_ulogic;
@@ -614,7 +613,7 @@ begin
             wb_dma_bte    : out   std_ulogic_vector(1 downto 0);
             wb_dma_err    : in    std_ulogic;
             -- connections to SD card
-            sdcard_data   : inout std_ulogic_vector(3 downto 0);
+            sdcard_data   : inout std_ulogic_vector(7 downto 0);
             sdcard_cmd    : inout std_ulogic;
             sdcard_clk    : out   std_ulogic;
             sdcard_cd     : in    std_ulogic;
@@ -652,7 +651,7 @@ begin
                 wb_dma_cti    => open,
                 wb_dma_bte    => open,
                 wb_dma_err    => '0',
-                sdcard_data   => sdcard_data(3 downto 0),
+                sdcard_data   => sdcard_data(7 downto 0),
                 sdcard_cmd    => sdcard_cmd,
                 sdcard_clk    => sdcard_clk,
                 -- card present is 0

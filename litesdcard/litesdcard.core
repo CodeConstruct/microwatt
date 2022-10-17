@@ -12,4 +12,4 @@ generators:
       based on the vendor type.
 
       Parameters:
-        vendor: The vendor type (xilinx)
+        target: The platform type (xilinx, lattice, xilinx8)

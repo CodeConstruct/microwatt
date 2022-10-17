@@ -374,7 +374,7 @@ targets:
       - has_fpu
       - has_btc
       - has_lpc=true
-    generate: [litedram_nexys_video, liteeth_antmicro_artix_dc_scm, litesdcard_nexys_video, git_hash]
+    generate: [litedram_nexys_video, liteeth_antmicro_artix_dc_scm, litesdcard_antmicro_artix_dc_scm, git_hash]
     tools:
       vivado: {part : xc7a100tfgg484-1}
     toplevel : toplevel
@@ -465,11 +465,15 @@ generate:
 
   litesdcard_arty:
     generator: litesdcard_gen
-    parameters: {vendor : xilinx}
+    parameters: {target : xilinx}
 
   litesdcard_nexys_video:
     generator: litesdcard_gen
-    parameters: {vendor : xilinx}
+    parameters: {target : xilinx}
+
+  litesdcard_antmicro_artix_dc_scm:
+    generator: litesdcard_gen
+    parameters: {target : xilinx8}
 
   litedram_nexys_video:
     generator: litedram_gen
